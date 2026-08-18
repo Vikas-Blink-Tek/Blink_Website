@@ -191,6 +191,65 @@ const Hero = () => (
 );
 
 /* ═══════════════════════════════════════════════════════════════
+   BANK PARTNERS MARQUEE
+   ═══════════════════════════════════════════════════════════════ */
+const BankPartners = () => {
+  const banks = [
+    { name: "HDFC Bank", src: "https://logo.clearbit.com/hdfcbank.com" },
+    { name: "ICICI Bank", src: "https://logo.clearbit.com/icicibank.com" },
+    { name: "State Bank of India", src: "https://logo.clearbit.com/onlinesbi.sbi" },
+    { name: "Axis Bank", src: "https://logo.clearbit.com/axisbank.com" },
+    { name: "Kotak Mahindra", src: "https://logo.clearbit.com/kotak.com" },
+    { name: "Bajaj Finserv", src: "https://logo.clearbit.com/bajajfinserv.in" },
+    { name: "IDFC First Bank", src: "https://logo.clearbit.com/idfcfirstbank.com" },
+    { name: "Tata Capital", src: "https://logo.clearbit.com/tatacapital.com" },
+  ];
+
+  // Duplicate for infinite scroll effect
+  const marqueeItems = [...banks, ...banks, ...banks, ...banks];
+
+  return (
+    <section className="py-12 bg-white border-y border-black/10 overflow-hidden relative">
+      <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
+        <h3 className="text-sm font-bold text-foreground/50 tracking-[0.2em] uppercase">Trusted Partnerships with 50+ Leading Institutions</h3>
+      </div>
+
+      <div className="relative flex overflow-x-hidden group">
+        <div className="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none"></div>
+
+        <motion.div
+          className="flex whitespace-nowrap gap-16 md:gap-24 px-10 items-center"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ repeat: Infinity, duration: 40, ease: "linear" }}
+        >
+          {marqueeItems.map((bank, idx) => (
+            <div key={idx} className="flex items-center gap-4 hover:scale-110 transition-transform cursor-pointer shrink-0 opacity-60 hover:opacity-100 grayscale hover:grayscale-0">
+              <img
+                src={bank.src}
+                alt={bank.name}
+                className="h-8 md:h-12 w-auto object-contain max-w-[150px]"
+                loading="lazy"
+                crossOrigin="anonymous"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  if (e.currentTarget.nextElementSibling) {
+                    (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'block';
+                  }
+                }}
+              />
+              <div style={{ display: 'none' }} className="text-2xl md:text-3xl font-black font-display tracking-tighter text-foreground/80">
+                {bank.name}
+              </div>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════════
    THE STATEMENT (Scroll Reveal)
    ═══════════════════════════════════════════════════════════════ */
 const TheStatement = () => {
@@ -379,7 +438,7 @@ const TeamSection = () => {
     {
       name: "Ashish Ashok Ghadge",
       title: "Managing Partner",
-      bio: "With over 4 years of experience in the financial services industry, Ashish Ghadge is the dynamic force behind Blink Finance. His vision is to create a transparent and client-centric platform that simplifies access to loans for individuals and businesses. Ashish specializes in loan consulting, relationship building, and partner network development, ensuring Blink Finance stays agile and efficient in a competitive market.",
+      bio: "With over 5 years of experience in the financial services industry, Ashish Ghadge is the dynamic force behind Blink Finance. His vision is to create a transparent and client-centric platform that simplifies access to loans for individuals and businesses. Ashish specializes in loan consulting, relationship building, and partner network development, ensuring Blink Finance stays agile and efficient in a competitive market.",
       image: "/directors/ashish.png"
     },
     {
@@ -426,9 +485,9 @@ const TeamSection = () => {
 
                 <div className="relative w-48 h-48 md:w-56 md:h-56 mb-8 rounded-full p-2 bg-gradient-to-br from-brand-amber to-brand-orange shadow-xl group-hover:scale-105 transition-transform duration-500">
                   <div className="w-full h-full rounded-full overflow-hidden bg-white">
-                    <img 
-                      src={member.image} 
-                      alt={member.name} 
+                    <img
+                      src={member.image}
+                      alt={member.name}
                       className="w-full h-full object-cover object-top"
                     />
                   </div>
@@ -833,6 +892,7 @@ export default function App() {
     <main id="main-content" className="w-full bg-background min-h-screen text-foreground scroll-smooth font-body relative" role="main">
       <Navbar />
       <Hero />
+      <BankPartners />
       <TheStatement />
       <TheProducts />
       <TheMetrics />
