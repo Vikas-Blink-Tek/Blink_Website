@@ -195,14 +195,12 @@ const Hero = () => (
    ═══════════════════════════════════════════════════════════════ */
 const BankPartners = () => {
   const banks = [
-    { name: "HDFC Bank", src: "https://logo.clearbit.com/hdfcbank.com" },
-    { name: "ICICI Bank", src: "https://logo.clearbit.com/icicibank.com" },
-    { name: "State Bank of India", src: "https://logo.clearbit.com/onlinesbi.sbi" },
-    { name: "Axis Bank", src: "https://logo.clearbit.com/axisbank.com" },
-    { name: "Kotak Mahindra", src: "https://logo.clearbit.com/kotak.com" },
-    { name: "Bajaj Finserv", src: "https://logo.clearbit.com/bajajfinserv.in" },
-    { name: "IDFC First Bank", src: "https://logo.clearbit.com/idfcfirstbank.com" },
-    { name: "Tata Capital", src: "https://logo.clearbit.com/tatacapital.com" },
+    { name: "HDFC Bank", src: "https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg" },
+    { name: "ICICI Bank", src: "https://upload.wikimedia.org/wikipedia/commons/1/12/ICICI_Bank_Logo.svg" },
+    { name: "State Bank of India", src: "https://upload.wikimedia.org/wikipedia/commons/c/cc/SBI-logo.svg" },
+    { name: "Axis Bank", src: "https://upload.wikimedia.org/wikipedia/commons/1/1a/Axis_Bank_logo.svg" },
+    { name: "Kotak Mahindra", src: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Kotak_Mahindra_Bank_logo.svg" },
+    { name: "Bajaj Finserv", src: "https://upload.wikimedia.org/wikipedia/commons/9/97/Bajaj_Finserv_Logo.svg" },
   ];
 
   // Duplicate for infinite scroll effect
@@ -295,10 +293,30 @@ const TheProducts = () => {
   const x = useTransform(scrollYProgress, [0, 1], ["0%", "-75%"]);
 
   const loans = [
-    { title: 'Home Loan', desc: 'Make your dream home a reality with highly competitive interest rates.', icon: <Home className="w-24 h-24" /> },
-    { title: 'Mortgage Loan', desc: 'Unlock the immense hidden value of your property for immediate needs.', icon: <Building className="w-24 h-24" /> },
-    { title: 'Personal Loan', desc: 'Lightning-quick funds for weddings, travel, medical, or life.', icon: <Users className="w-24 h-24" /> },
-    { title: 'Business Loan', desc: 'Fuel your enterprise growth with massive, flexible financing options.', icon: <Briefcase className="w-24 h-24" /> },
+    { 
+      title: 'Home Loan', 
+      desc: 'Make your dream home a reality with highly competitive interest rates.', 
+      icon: <Home className="w-16 h-16" />,
+      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    },
+    { 
+      title: 'Mortgage Loan', 
+      desc: 'Unlock the immense hidden value of your property for immediate needs.', 
+      icon: <Building className="w-16 h-16" />,
+      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    },
+    { 
+      title: 'Personal Loan', 
+      desc: 'Lightning-quick funds for weddings, travel, medical, or life.', 
+      icon: <Users className="w-16 h-16" />,
+      image: "https://images.unsplash.com/photo-1573164713988-8665fc963095?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    },
+    { 
+      title: 'Business Loan', 
+      desc: 'Fuel your enterprise growth with massive, flexible financing options.', 
+      icon: <Briefcase className="w-16 h-16" />,
+      image: "https://images.unsplash.com/photo-1556761175-4b46a572b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    },
   ];
 
   return (
@@ -307,17 +325,27 @@ const TheProducts = () => {
         <div className="absolute top-20 lg:top-32 left-10 lg:left-20 text-foreground/40 text-sm md:text-base font-bold tracking-[0.2em] uppercase">Our Products</div>
         <motion.div style={{ x }} className="flex gap-10 lg:gap-20 px-10 lg:px-20 ml-10 lg:ml-20">
           {loans.map((loan, idx) => (
-            <div key={idx} className="w-[85vw] lg:w-[60vw] h-[60vh] shrink-0 bg-white border border-black/10 rounded-[3rem] p-12 lg:p-20 flex flex-col justify-between hover:border-brand-orange/30 transition-all duration-500 group cursor-default shadow-2xl relative overflow-hidden">
-              {/* Decorative background glow */}
-              <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-brand-orange/10 blur-3xl rounded-full group-hover:bg-brand-pink/20 transition-colors duration-1000 transform-gpu"></div>
+            <div key={idx} className="w-[85vw] lg:w-[65vw] h-[65vh] shrink-0 bg-white border border-black/10 rounded-[3rem] flex hover:border-brand-orange/30 transition-all duration-500 group shadow-2xl relative overflow-hidden">
+              
+              {/* Image Half */}
+              <div className="w-2/5 h-full relative hidden lg:block overflow-hidden bg-slate-100 border-r border-black/5">
+                <div className="absolute inset-0 bg-black/10 z-10 group-hover:bg-transparent transition-all duration-500"></div>
+                <img src={loan.image} alt={loan.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" crossOrigin="anonymous" />
+              </div>
 
-              <div className="text-brand-orange opacity-60 group-hover:scale-110 group-hover:opacity-100 transition-all duration-500 origin-left relative z-10">
-                {loan.icon}
+              {/* Text Half */}
+              <div className="w-full lg:w-3/5 p-12 lg:p-20 flex flex-col justify-center relative">
+                <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-brand-orange/10 blur-3xl rounded-full group-hover:bg-brand-pink/20 transition-colors duration-1000 transform-gpu z-0 pointer-events-none"></div>
+                
+                <div className="text-brand-orange opacity-80 group-hover:scale-110 group-hover:opacity-100 transition-all duration-500 origin-left relative z-10 mb-8">
+                  {loan.icon}
+                </div>
+                <div className="relative z-10">
+                  <h2 className="text-5xl lg:text-7xl font-black font-display text-foreground mb-6 tracking-tighter">{loan.title}</h2>
+                  <p className="text-xl lg:text-2xl text-foreground/60 max-w-xl leading-relaxed font-medium">{loan.desc}</p>
+                </div>
               </div>
-              <div className="relative z-10">
-                <h2 className="text-5xl lg:text-8xl font-black font-display text-foreground mb-6 lg:mb-8 tracking-tighter">{loan.title}</h2>
-                <p className="text-xl lg:text-3xl text-foreground/60 max-w-2xl leading-relaxed font-medium">{loan.desc}</p>
-              </div>
+
             </div>
           ))}
         </motion.div>
