@@ -1,0 +1,26 @@
+# Blink Finance - Robots.txt
+# https://www.blinkfinance.in
+
+User-agent: *
+Allow: /
+Disallow: /assets/
+Disallow: /src/
+
+# Sitemap
+Sitemap: https://www.blinkfinance.in/sitemap.xml
+
+# Crawl-delay (optional, polite crawling)
+Crawl-delay: 1
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+Allow: /*.jpg$
+Allow: /*.png$
+Allow: /*.webp$
+Allow: /*.svg$
+
+# Bing specific
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 2

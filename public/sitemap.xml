@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://www.blinkfinance.in/</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.blinkfinance.in/main_office_3d.jpg</image:loc>
+      <image:title>Blink Finance Main Office - 3D Visualization</image:title>
+      <image:caption>Blink Finance headquarters in Mira Road, Mumbai - Your trusted loan DSA partner</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.blinkfinance.in/new_logo.png</image:loc>
+      <image:title>Blink Finance Logo</image:title>
+      <image:caption>Blink Finance - Right Credit. Not Just Random Loans.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.blinkfinance.in/office_exterior.jpg</image:loc>
+      <image:title>Blink Finance Office Exterior</image:title>
+      <image:caption>Modern office of Blink Finance loan DSA in Mira Road, Maharashtra</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.blinkfinance.in/passage_3d.jpg</image:loc>
+      <image:title>Blink Finance Office Interior</image:title>
+      <image:caption>Interior view of Blink Finance office - Professional loan consulting environment</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.blinkfinance.in/business_bg_3d.jpg</image:loc>
+      <image:title>Business and Loan Processing Center</image:title>
+      <image:caption>Blink Finance business loan processing and consultation center</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Section anchors as separate URLs for crawlers -->
+  <url>
+    <loc>https://www.blinkfinance.in/#about</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.blinkfinance.in/#offerings</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://www.blinkfinance.in/#process</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://www.blinkfinance.in/#apply</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://www.blinkfinance.in/#contact</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.blinkfinance.in/#faq</loc>
+    <lastmod>2026-08-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>
