@@ -205,7 +205,7 @@ const TheStatement = () => {
   const scale = useTransform(scrollYProgress, [0, 1], [0.9, 1.1]);
 
   return (
-    <section ref={ref} className="h-[150vh] bg-background text-foreground relative border-t border-black/10">
+    <section id="about" ref={ref} className="h-[150vh] bg-background text-foreground relative border-t border-black/10">
       <div className="sticky top-0 h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
         <motion.div style={{ scale }} className="text-center max-w-6xl">
           <motion.span style={{ opacity: opacity1 }} className="text-5xl md:text-7xl lg:text-8xl font-extrabold font-display block mb-4 tracking-tighter">
@@ -242,14 +242,14 @@ const TheProducts = () => {
   ];
 
   return (
-    <section ref={targetRef} className="relative h-[300vh] bg-background border-t border-black/10" id="offerings">
+    <section ref={targetRef} className="relative h-[300vh] bg-background border-t border-black/10" id="products">
       <div className="sticky top-0 h-screen flex items-center overflow-hidden">
         <div className="absolute top-20 lg:top-32 left-10 lg:left-20 text-foreground/40 text-sm md:text-base font-bold tracking-[0.2em] uppercase">Our Products</div>
         <motion.div style={{ x }} className="flex gap-10 lg:gap-20 px-10 lg:px-20 ml-10 lg:ml-20">
           {loans.map((loan, idx) => (
             <div key={idx} className="w-[85vw] lg:w-[60vw] h-[60vh] shrink-0 bg-white border border-black/10 rounded-[3rem] p-12 lg:p-20 flex flex-col justify-between hover:border-brand-orange/30 transition-all duration-500 group cursor-default shadow-2xl relative overflow-hidden">
               {/* Decorative background glow */}
-              <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-brand-orange/10 blur-[100px] rounded-full group-hover:bg-brand-pink/20 transition-colors duration-1000"></div>
+              <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-brand-orange/10 blur-3xl rounded-full group-hover:bg-brand-pink/20 transition-colors duration-1000 transform-gpu"></div>
 
               <div className="text-brand-orange opacity-60 group-hover:scale-110 group-hover:opacity-100 transition-all duration-500 origin-left relative z-10">
                 {loan.icon}
@@ -291,7 +291,7 @@ const TheMetrics = () => {
         <div className="text-2xl md:text-3xl text-foreground/50 mt-8 font-medium">And counting every single day.</div>
       </motion.div>
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.05)_0%,transparent_60%)] blur-[100px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.05)_0%,transparent_60%)] blur-3xl transform-gpu" />
     </section>
   );
 };
@@ -353,7 +353,7 @@ const ProcessRoadmap = () => {
                   <div className="w-full md:w-1/2 pl-12 md:pl-0 perspective-1000">
                     <Tilt tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2000} className="w-full">
                       <div className="bg-white rounded-3xl p-8 border border-black/10 shadow-xl hover:border-brand-orange/30 transition-colors group relative overflow-hidden">
-                        <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-brand-orange/5 blur-[50px] rounded-full group-hover:bg-brand-orange/10 transition-all duration-500"></div>
+                        <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-brand-orange/5 blur-2xl rounded-full group-hover:bg-brand-orange/10 transition-all duration-500 transform-gpu"></div>
                         <h3 className="text-2xl font-black font-display text-foreground mb-3 tracking-tight"><span className="text-brand-orange mr-2">0{idx + 1}.</span> {step.title}</h3>
                         <p className="text-foreground/70 font-medium leading-relaxed">{step.desc}</p>
                       </div>
@@ -364,6 +364,87 @@ const ProcessRoadmap = () => {
               )
             })}
           </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   TEAM / DIRECTORS SECTION
+   ═══════════════════════════════════════════════════════════════ */
+const TeamSection = () => {
+  const team = [
+    {
+      name: "Ashish Ashok Ghadge",
+      title: "Managing Partner",
+      bio: "With over 4 years of experience in the financial services industry, Ashish Ghadge is the dynamic force behind Blink Finance. His vision is to create a transparent and client-centric platform that simplifies access to loans for individuals and businesses. Ashish specializes in loan consulting, relationship building, and partner network development, ensuring Blink Finance stays agile and efficient in a competitive market.",
+      image: "/directors/ashish.png"
+    },
+    {
+      name: "Rekha Ghadge",
+      title: "Partner",
+      bio: "Ms. Rekha Ghadge is a founding partner of Blink Finance, contributing to the company's growth through her strong commitment to organizational development and client relationships. While not from a traditional finance background, she brings valuable perspective in business coordination, stakeholder engagement, and operational support.",
+      image: "/directors/rekha.png"
+    }
+  ];
+
+  return (
+    <section id="team" className="py-24 relative bg-background overflow-hidden">
+      {/* Background accents */}
+      <div className="absolute top-0 right-1/4 w-[40rem] h-[40rem] bg-[radial-gradient(circle_at_center,rgba(234,88,12,0.1)_0%,transparent_60%)] rounded-full pointer-events-none transform-gpu"></div>
+      <div className="absolute bottom-0 left-1/4 w-[30rem] h-[30rem] bg-[radial-gradient(circle_at_center,rgba(0,158,95,0.1)_0%,transparent_60%)] rounded-full pointer-events-none transform-gpu"></div>
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-extrabold font-display text-foreground tracking-tight mb-4">
+            Meet the <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-amber to-brand-orange">Visionaries</span>
+          </h2>
+          <p className="text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto">
+            The leadership driving Blink Finance's commitment to transparent, efficient, and client-centric financial solutions.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 perspective-1000">
+          {team.map((member, index) => (
+            <Tilt key={index} tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2000} className="h-full">
+              <motion.div
+                initial={{ opacity: 0, y: 40, rotateX: 10 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.7, delay: index * 0.2 }}
+                className="h-full group relative bg-white/60 backdrop-blur-md border border-black/5 rounded-3xl p-8 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-500 overflow-hidden flex flex-col items-center text-center transform-gpu will-change-transform"
+              >
+                {/* Hover gradient border effect */}
+                <div className="absolute inset-0 bg-gradient-to-br from-brand-amber/20 via-transparent to-brand-orange/20 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+
+                <div className="relative w-48 h-48 md:w-56 md:h-56 mb-8 rounded-full p-2 bg-gradient-to-br from-brand-amber to-brand-orange shadow-xl group-hover:scale-105 transition-transform duration-500">
+                  <div className="w-full h-full rounded-full overflow-hidden bg-white">
+                    <img 
+                      src={member.image} 
+                      alt={member.name} 
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                </div>
+
+                <h3 className="text-3xl font-bold font-display text-foreground mb-2 group-hover:text-brand-orange transition-colors">
+                  {member.name}
+                </h3>
+                <p className="text-brand-amber font-semibold tracking-widest uppercase text-sm mb-6">
+                  {member.title}
+                </p>
+                <p className="text-foreground/70 leading-relaxed max-w-md mx-auto text-lg">
+                  "{member.bio}"
+                </p>
+              </motion.div>
+            </Tilt>
+          ))}
         </div>
       </div>
     </section>
@@ -755,6 +836,7 @@ export default function App() {
       <TheProducts />
       <TheMetrics />
       <ProcessRoadmap />
+      <TeamSection />
       <ClientShowcase />
       <LeadForm />
       <FAQ />
