@@ -39,9 +39,10 @@ const Navbar = () => {
 
   const links = [
     { label: 'About', href: '#about' },
-    { label: 'Services', href: '#why' },
-    { label: 'Loans', href: '#offerings' },
+    { label: 'Loans', href: '#products' },
     { label: 'How It Works', href: '#process' },
+    { label: 'Team', href: '#team' },
+    { label: 'FAQ', href: '#faq' },
     { label: 'Contact', href: '#contact' },
   ];
 
@@ -142,7 +143,7 @@ const Hero = () => (
 
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: "easeOut" }} className="mb-6">
         <span className="px-6 py-2 rounded-full bg-white shadow-md border border-black/5 text-foreground/90 text-sm font-bold tracking-widest uppercase">
-          Welcome to the Future of Finance
+          Your Trusted Loan DSA Partner
         </span>
       </motion.div>
 
@@ -152,14 +153,14 @@ const Hero = () => (
       </motion.h1>
 
       <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }} className="text-xl md:text-2xl text-foreground/70 mb-10 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-sm">
-        Your Trusted Loan Partner across India. We provide lightning-fast, transparent, and tailored financial solutions to power your dreams.
+        Your premier DSA partner across India. We connect you with 50+ top banks to provide lightning-fast, transparent, and tailored loan solutions.
       </motion.p>
 
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }} className="flex flex-col sm:flex-row gap-6 w-full justify-center items-center mb-24">
         <a href="#apply" className="bg-gradient-brand text-white font-bold py-5 px-10 rounded-full hover:shadow-[0_10px_40px_rgba(29,78,216,0.3)] transition-all hover:-translate-y-1 flex items-center justify-center gap-3 text-lg w-full sm:w-auto">
           Check Eligibility <ArrowRight className="w-6 h-6" />
         </a>
-        <a href="#offerings" className="bg-white shadow-lg border border-black/5 text-foreground font-bold py-5 px-10 rounded-full hover:bg-slate-50 transition-all hover:-translate-y-1 flex items-center justify-center gap-3 text-lg w-full sm:w-auto">
+        <a href="#products" className="bg-white shadow-lg border border-black/5 text-foreground font-bold py-5 px-10 rounded-full hover:bg-slate-50 transition-all hover:-translate-y-1 flex items-center justify-center gap-3 text-lg w-full sm:w-auto">
           Explore Loans <ChevronRight className="w-6 h-6" />
         </a>
       </motion.div>
@@ -209,13 +210,13 @@ const TheStatement = () => {
       <div className="sticky top-0 h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
         <motion.div style={{ scale }} className="text-center max-w-6xl">
           <motion.span style={{ opacity: opacity1 }} className="text-5xl md:text-7xl lg:text-8xl font-extrabold font-display block mb-4 tracking-tighter">
-            We don't just give the loan.
+            We don't just process loans.
           </motion.span>
           <motion.span style={{ opacity: opacity2 }} className="text-5xl md:text-7xl lg:text-8xl font-extrabold font-display text-foreground/40 block mb-4 tracking-tighter">
-            We support
+            We finance
           </motion.span>
           <motion.span style={{ opacity: opacity3 }} className="text-6xl md:text-8xl lg:text-9xl font-black font-display text-transparent bg-clip-text bg-gradient-to-r from-brand-orange via-brand-pink to-brand-yellow block tracking-tighter drop-shadow-sm">
-            your business.
+            your growth.
           </motion.span>
         </motion.div>
       </div>
@@ -286,9 +287,9 @@ const TheMetrics = () => {
           1000+
         </div>
         <div className="text-4xl md:text-7xl font-black text-brand-orange mt-8 tracking-tighter font-display">
-          Successful Clients.
+          Loans Disbursed.
         </div>
-        <div className="text-2xl md:text-3xl text-foreground/50 mt-8 font-medium">And counting every single day.</div>
+        <div className="text-2xl md:text-3xl text-foreground/50 mt-8 font-medium">Empowering clients every single day.</div>
       </motion.div>
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(249,115,22,0.05)_0%,transparent_60%)] blur-3xl transform-gpu" />
@@ -403,7 +404,7 @@ const TeamSection = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-extrabold font-display text-foreground tracking-tight mb-4">
-            Meet the <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-amber to-brand-orange">Visionaries</span>
+            Meet the <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-pink to-brand-orange">Visionaries</span>
           </h2>
           <p className="text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto">
             The leadership driving Blink Finance's commitment to transparent, efficient, and client-centric financial solutions.
@@ -592,7 +593,7 @@ const LeadForm = () => {
               <>
                 <div className="text-center mb-10">
                   <img src="/new_logo.png" alt="Blink Finance" className="h-20 w-auto object-contain mx-auto mb-6 drop-shadow-md" />
-                  <h2 className="text-5xl font-extrabold font-display mb-4 text-foreground">Let's Unlock Your <span className="text-gradient">Financial Growth</span></h2>
+                  <h2 className="text-5xl font-extrabold font-display mb-4 text-foreground">Apply For Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-pink to-brand-orange">Loan Today</span></h2>
                   <p className="text-foreground/70 text-xl font-medium">Leave your details and our loan experts will get back to you in a blink.</p>
                 </div>
 
@@ -786,7 +787,7 @@ const Footer = () => (
                 <h4 className="text-white font-extrabold font-display mb-5 text-xl">Quick Links</h4>
                 <ul className="space-y-3 text-white/90 text-base font-medium grid grid-cols-2 gap-x-4">
                   <li><a href="#about" className="hover:text-brand-orange transition-colors">About Us</a></li>
-                  <li><a href="#offerings" className="hover:text-brand-orange transition-colors">Loan Products</a></li>
+                  <li><a href="#products" className="hover:text-brand-orange transition-colors">Loan Products</a></li>
                   <li><a href="#process" className="hover:text-brand-orange transition-colors">How It Works</a></li>
                   <li><a href="#apply" className="hover:text-brand-orange transition-colors">Apply Now</a></li>
                 </ul>
