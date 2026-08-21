@@ -12,8 +12,8 @@
   --color-dark-text: #0F172A;
 
   /* Use a premium unified font family */
-  --font-display: 'Plus Jakarta Sans', sans-serif;
-  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Manrope', sans-serif;
 
   --animate-count-up: count-up 2s ease-out forwards;
 }

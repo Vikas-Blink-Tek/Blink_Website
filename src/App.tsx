@@ -1,25 +1,22 @@
 import { useEffect, useState, useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import {
   CheckCircle2,
   Landmark,
   ShieldCheck,
-  Users,
-  Briefcase,
-  Home,
-  Building,
   Menu,
   X,
   ArrowRight,
+  ChevronRight,
+  Users,
   Phone,
   Mail,
   MapPin,
-  ChevronRight,
   Globe,
   Loader2,
   ChevronDown,
   HelpCircle,
-  MessageCircle,
+  MessageCircle
 } from 'lucide-react';
 import Tilt from 'react-parallax-tilt';
 import ReCAPTCHA from 'react-google-recaptcha';
@@ -195,16 +192,18 @@ const Hero = () => (
    ═══════════════════════════════════════════════════════════════ */
 const BankPartners = () => {
   const banks = [
-    { name: "HDFC Bank", src: "https://upload.wikimedia.org/wikipedia/commons/2/28/HDFC_Bank_Logo.svg" },
-    { name: "ICICI Bank", src: "https://upload.wikimedia.org/wikipedia/commons/1/12/ICICI_Bank_Logo.svg" },
-    { name: "State Bank of India", src: "https://upload.wikimedia.org/wikipedia/commons/c/cc/SBI-logo.svg" },
-    { name: "Axis Bank", src: "https://upload.wikimedia.org/wikipedia/commons/1/1a/Axis_Bank_logo.svg" },
-    { name: "Kotak Mahindra", src: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Kotak_Mahindra_Bank_logo.svg" },
-    { name: "Bajaj Finserv", src: "https://upload.wikimedia.org/wikipedia/commons/9/97/Bajaj_Finserv_Logo.svg" },
+    { name: "HDFC Bank", src: "/banks/hdfc_bank.svg" },
+    { name: "ICICI Bank", src: "/banks/icici_bank.svg" },
+    { name: "State Bank of India", src: "/banks/sbi.svg" },
+    { name: "Axis Bank", src: "/banks/axis_bank.svg" },
+    { name: "Bajaj Finserv", src: "/banks/bajaj-finserv-1.svg" },
+    { name: "Bank of Baroda", src: "/banks/bank-of-baroda-1.svg" },
+    { name: "Punjab National Bank", src: "/banks/punjab-national-bank.svg" },
+    { name: "Union Bank of India", src: "/banks/union-bank-of-india.svg" },
   ];
 
   // Duplicate for infinite scroll effect
-  const marqueeItems = [...banks, ...banks, ...banks, ...banks];
+  const marqueeItems = [...banks, ...banks, ...banks, ...banks, ...banks, ...banks];
 
   return (
     <section className="py-12 bg-white border-y border-black/10 overflow-hidden relative">
@@ -285,72 +284,170 @@ const TheStatement = () => {
    THE PRODUCTS (Horizontal Scroll)
    ═══════════════════════════════════════════════════════════════ */
 const TheProducts = () => {
-  const targetRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  
+  // Track scroll specifically for this section
   const { scrollYProgress } = useScroll({
-    target: targetRef,
+    target: containerRef,
+    offset: ["start end", "end start"]
   });
 
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-75%"]);
+  // Create highly visible parallax values for the columns, but bounded so they don't hide
+  // Outer columns slide UP as you scroll down
+  const colOuterY = useTransform(scrollYProgress, [0, 1], [60, -60]);
+  // Middle columns slide DOWN as you scroll down
+  const colInnerY = useTransform(scrollYProgress, [0, 1], [-60, 60]);
 
   const loans = [
-    { 
-      title: 'Home Loan', 
-      desc: 'Make your dream home a reality with highly competitive interest rates.', 
-      icon: <Home className="w-16 h-16" />,
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
-    { 
-      title: 'Mortgage Loan', 
-      desc: 'Unlock the immense hidden value of your property for immediate needs.', 
-      icon: <Building className="w-16 h-16" />,
-      image: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
-    { 
-      title: 'Personal Loan', 
-      desc: 'Lightning-quick funds for weddings, travel, medical, or life.', 
-      icon: <Users className="w-16 h-16" />,
-      image: "https://images.unsplash.com/photo-1573164713988-8665fc963095?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
-    { 
-      title: 'Business Loan', 
-      desc: 'Fuel your enterprise growth with massive, flexible financing options.', 
-      icon: <Briefcase className="w-16 h-16" />,
-      image: "https://images.unsplash.com/photo-1556761175-4b46a572b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-    },
+    { id: '1', title: 'Home Loan', image: '/loans/home_loan.jpg', desc: 'Affordable home financing solutions with competitive interest rates, flexible tenure options, and fast-track approvals to help you secure your dream home without stress.' },
+    { id: '2', title: 'Mortgage Loan', image: '/loans/mortgage_loan.jpg', desc: 'Unlock the hidden value of your property to secure high-value funds with flexible repayment structures and highly attractive interest rates.' },
+    { id: '3', title: 'Personal Loan', image: '/loans/personal_loan.jpg', desc: 'Lightning-quick and hassle-free personal loans designed for medical emergencies, travel, weddings, education, or immediate lifestyle needs.' },
+    { id: '4', title: 'Business Loan', image: '/loans/business_loan.jpg', desc: 'Expand your enterprise with structured financial assistance specifically designed for working capital, infrastructure, and long-term exponential growth.' },
+    { id: '5', title: 'MSME Loan', image: '/loans/msme_loan.jpg', desc: 'Specialized funding support for Micro, Small & Medium Enterprises powered by government-backed schemes and incredibly easy eligibility criteria.' },
+    { id: '6', title: 'Machinery Loan', image: '/loans/machinery_loan.jpg', desc: 'Finance heavy machinery, essential tools, and industrial equipment with structured repayment plans to rapidly accelerate your production capacity.' },
+    { id: '7', title: 'CGTMSE Loan', image: '/loans/cgtmse_loan.jpg', desc: 'Collateral-free, stress-free loans for MSMEs strictly under the Government of India\'s CGTMSE scheme, offering extremely easy access to credit.' },
+    { id: '8', title: 'Working Capital', image: '/loans/working_capital.jpg', desc: 'Ensure perfectly smooth daily operations with working capital finance solutions that effortlessly manage cash flow, supplier payments, and staff salaries.' },
+    { id: '9', title: 'OD/CC', image: '/loans/od_cc.jpg', desc: 'Overdraft and cash credit facilities meticulously designed to manage liquidity efficiently, giving your business totally flexible access to on-demand funds.' },
+    { id: '10', title: 'Bill Discounting', image: '/loans/bill_discounting.jpg', desc: 'Improve business cash flow instantly and securely by converting your receivables and unpaid invoices into immediate, usable working capital.' },
+    { id: '11', title: 'Letter of Credit', image: '/loans/letter_of_credit.jpg', desc: 'Secure your domestic and international trade transactions completely with reliable letter of credit facilities that build absolute trust.' },
+    { id: '12', title: 'Bank Guarantee', image: '/loans/bank_guarantee.jpg', desc: 'Massively strengthen your business credibility with bulletproof financial guarantees for major contracts, high-stakes tenders, and project commitments.' },
   ];
 
   return (
-    <section ref={targetRef} className="relative h-[300vh] bg-background border-t border-black/10" id="products">
-      <div className="sticky top-0 h-screen flex items-center overflow-hidden">
-        <div className="absolute top-20 lg:top-32 left-10 lg:left-20 text-foreground/40 text-sm md:text-base font-bold tracking-[0.2em] uppercase">Our Products</div>
-        <motion.div style={{ x }} className="flex gap-10 lg:gap-20 px-10 lg:px-20 ml-10 lg:ml-20">
-          {loans.map((loan, idx) => (
-            <div key={idx} className="w-[85vw] lg:w-[65vw] h-[65vh] shrink-0 bg-white border border-black/10 rounded-[3rem] flex hover:border-brand-orange/30 transition-all duration-500 group shadow-2xl relative overflow-hidden">
+    <>
+      <section ref={containerRef} className="py-32 bg-slate-50 relative overflow-hidden" id="products">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center max-w-3xl mx-auto mb-24 relative z-10">
+            <p className="text-brand-orange font-bold text-sm tracking-widest uppercase mb-3">Our Loan Services</p>
+            <h2 className="text-5xl md:text-6xl font-black font-display text-purple-950 tracking-tight">
+              Financial Solutions <br/>Built For You
+            </h2>
+          </div>
+
+          {/* Parallax Columns Container */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-16 relative">
+            {loans.map((loan, idx) => {
+              // Assign parallax value based on column index
+              const isInnerCol = idx % 4 === 1 || idx % 4 === 2;
+              const parallaxY = isInnerCol ? colInnerY : colOuterY;
+
+              return (
+                <motion.div 
+                  key={loan.id} 
+                  layoutId={`card-${loan.id}`}
+                  style={{ y: parallaxY }}
+                  onClick={() => setSelectedId(loan.id)}
+                  className="bg-slate-900 rounded-[2rem] flex flex-col justify-end text-left h-[340px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] cursor-pointer group hover:shadow-[0_20px_40px_rgba(236,72,153,0.3)] transition-shadow duration-500 relative overflow-hidden"
+                >
+                  {/* Background Image */}
+                  <motion.img 
+                    layoutId={`image-${loan.id}`}
+                    src={loan.image} 
+                    alt={loan.title} 
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                  />
+                  
+                  {/* Dark Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
+                  
+                  {/* Subtle hover background sweep */}
+                  <div className="absolute inset-0 bg-brand-orange/0 group-hover:bg-brand-orange/20 transition-colors duration-500 mix-blend-overlay"></div>
+                  
+                  <div className="relative z-10 p-8">
+                    <motion.h3 
+                      layoutId={`title-${loan.id}`} 
+                      className="text-2xl md:text-3xl font-black font-display text-white leading-tight mb-2"
+                    >
+                      {loan.title}
+                    </motion.h3>
+                    
+                    <div className="text-brand-yellow text-xs font-bold uppercase tracking-[0.2em] opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                      Explore Details &rarr;
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Click-to-Expand Modal */}
+      <AnimatePresence>
+        {selectedId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-purple-950/40 backdrop-blur-md"
+            onClick={() => setSelectedId(null)}
+          >
+            {(() => {
+              const loan = loans.find(l => l.id === selectedId);
+              if (!loan) return null;
               
-              {/* Image Half */}
-              <div className="w-2/5 h-full relative hidden lg:block overflow-hidden bg-slate-100 border-r border-black/5">
-                <div className="absolute inset-0 bg-black/10 z-10 group-hover:bg-transparent transition-all duration-500"></div>
-                <img src={loan.image} alt={loan.title} className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700" crossOrigin="anonymous" />
-              </div>
-
-              {/* Text Half */}
-              <div className="w-full lg:w-3/5 p-12 lg:p-20 flex flex-col justify-center relative">
-                <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-brand-orange/10 blur-3xl rounded-full group-hover:bg-brand-pink/20 transition-colors duration-1000 transform-gpu z-0 pointer-events-none"></div>
-                
-                <div className="text-brand-orange opacity-80 group-hover:scale-110 group-hover:opacity-100 transition-all duration-500 origin-left relative z-10 mb-8">
-                  {loan.icon}
-                </div>
-                <div className="relative z-10">
-                  <h2 className="text-5xl lg:text-7xl font-black font-display text-foreground mb-6 tracking-tighter">{loan.title}</h2>
-                  <p className="text-xl lg:text-2xl text-foreground/60 max-w-xl leading-relaxed font-medium">{loan.desc}</p>
-                </div>
-              </div>
-
-            </div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
+              return (
+                <motion.div 
+                  layoutId={`card-${loan.id}`}
+                  className="bg-white rounded-[2.5rem] w-full max-w-4xl shadow-2xl relative overflow-hidden cursor-default flex flex-col md:flex-row"
+                  onClick={e => e.stopPropagation()}
+                >
+                  {/* Image side */}
+                  <div className="w-full md:w-5/12 h-64 md:h-auto relative">
+                    <motion.img 
+                      layoutId={`image-${loan.id}`}
+                      src={loan.image} 
+                      alt={loan.title} 
+                      className="absolute inset-0 w-full h-full object-cover" 
+                    />
+                    {/* Shadow overlay to blend with text section smoothly */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/30 md:hidden"></div>
+                  </div>
+                  
+                  {/* Content side */}
+                  <div className="w-full md:w-7/12 p-8 md:p-14 relative bg-white">
+                    {/* Decorative corner glow inside modal */}
+                    <div className="absolute -top-32 -right-32 w-96 h-96 bg-brand-orange/10 blur-3xl rounded-full"></div>
+                    <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-pink/10 blur-3xl rounded-full"></div>
+                    
+                    <div className="relative z-10 flex flex-col h-full justify-center">
+                      <motion.h3 
+                        layoutId={`title-${loan.id}`} 
+                        className="text-4xl md:text-5xl font-black font-display text-transparent bg-clip-text bg-gradient-to-br from-brand-pink to-brand-orange mb-6 leading-tight"
+                      >
+                        {loan.title}
+                      </motion.h3>
+                      
+                      <motion.p 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1, duration: 0.4 }}
+                        className="text-slate-600 text-lg leading-relaxed font-medium mb-10"
+                      >
+                        {loan.desc}
+                      </motion.p>
+                      
+                      <div className="mt-auto">
+                        <motion.button 
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.2 }}
+                          onClick={() => setSelectedId(null)}
+                          className="bg-purple-950 text-white px-8 py-3.5 rounded-full font-bold text-sm tracking-widest uppercase hover:bg-purple-900 hover:shadow-lg hover:shadow-purple-950/20 transition-all active:scale-95"
+                        >
+                          Close Details
+                        </motion.button>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })()}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
@@ -467,13 +564,15 @@ const TeamSection = () => {
       name: "Ashish Ashok Ghadge",
       title: "Managing Partner",
       bio: "With over 5 years of experience in the financial services industry, Ashish Ghadge is the dynamic force behind Blink Finance. His vision is to create a transparent and client-centric platform that simplifies access to loans for individuals and businesses. Ashish specializes in loan consulting, relationship building, and partner network development, ensuring Blink Finance stays agile and efficient in a competitive market.",
-      image: "/directors/ashish.png"
+      image: "/directors/ashish.png",
+      imageStyle: "w-full h-full object-cover object-[center_30%] scale-[1.8]"
     },
     {
       name: "Rekha Ghadge",
       title: "Partner",
       bio: "Ms. Rekha Ghadge is a founding partner of Blink Finance, contributing to the company's growth through her strong commitment to organizational development and client relationships. While not from a traditional finance background, she brings valuable perspective in business coordination, stakeholder engagement, and operational support.",
-      image: "/directors/rekha.png"
+      image: "/directors/rekha.png",
+      imageStyle: "w-full h-full object-cover object-top"
     }
   ];
 
@@ -516,7 +615,7 @@ const TeamSection = () => {
                     <img
                       src={member.image}
                       alt={member.name}
-                      className="w-full h-full object-cover object-top"
+                      className={member.imageStyle || "w-full h-full object-cover object-top"}
                     />
                   </div>
                 </div>
