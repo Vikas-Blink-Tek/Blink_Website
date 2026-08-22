@@ -1,0 +1,159 @@
+# ═══════════════════════════════════════════════════════════════
+# Blink Finance — .htaccess Security Configuration
+# OWASP Top 10 Hardening for Hostinger Apache Server
+# ═══════════════════════════════════════════════════════════════
+
+# ─── ENABLE REWRITE ENGINE ────────────────────────────────────
+RewriteEngine On
+
+# ─── FORCE HTTPS (A2: Cryptographic Failures) ────────────────
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# ─── REDIRECT WWW TO NON-WWW (match SSL cert) ────────────────
+RewriteCond %{HTTP_HOST} ^www\.blinkfinance\.in$ [NC]
+RewriteRule ^(.*)$ https://blinkfinance.in/$1 [L,R=301]
+
+# ═══════════════════════════════════════════════════════════════
+# SECURITY HEADERS (A5: Security Misconfiguration / A7: XSS)
+# ═══════════════════════════════════════════════════════════════
+
+<IfModule mod_headers.c>
+  # Content Security Policy — whitelist trusted sources only
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://formsubmit.co https://www.google.com https://www.google-analytics.com; frame-src https://www.google.com https://www.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co;"
+
+  # Prevent MIME-type sniffing
+  Header set X-Content-Type-Options "nosniff"
+
+  # Prevent clickjacking — only allow same-origin framing
+  Header set X-Frame-Options "SAMEORIGIN"
+
+  # XSS Protection for legacy browsers
+  Header set X-XSS-Protection "1; mode=block"
+
+  # Referrer Policy — don't leak full URLs to external sites
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Permissions Policy — disable unused browser features
+  Header set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
+
+  # HSTS — force HTTPS for 1 year (without includeSubDomains since SSL only covers root domain)
+  Header set Strict-Transport-Security "max-age=31536000"
+
+  # Prevent page from being cached with sensitive data
+  Header set X-Permitted-Cross-Domain-Policies "none"
+
+  # Remove server version info (reduces fingerprinting)
+  Header unset X-Powered-By
+  Header unset Server
+</IfModule>
+
+# ═══════════════════════════════════════════════════════════════
+# BLOCK SENSITIVE FILES (A1: Broken Access Control)
+# ═══════════════════════════════════════════════════════════════
+
+# Block access to hidden files (.env, .git, .htpasswd, etc.)
+<FilesMatch "^\.">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# Block access to sensitive config files
+<FilesMatch "(package\.json|package-lock\.json|tsconfig\.json|vite\.config\.|\.env|\.gitignore|composer\.json|composer\.lock|wp-config\.php)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# Block access to backup files
+<FilesMatch "\.(bak|backup|old|orig|save|swp|tmp|sql|db|sqlite|log)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# ═══════════════════════════════════════════════════════════════
+# BLOCK PHP EXECUTION (Prevents Shell Uploads / A8: Integrity)
+# ═══════════════════════════════════════════════════════════════
+
+# Disable PHP execution entirely (this is a static React site)
+<FilesMatch "\.ph(p[3-8]?|tml)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# Also block common webshell extensions
+<FilesMatch "\.(cgi|pl|py|rb|sh|bash)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# ═══════════════════════════════════════════════════════════════
+# DISABLE DIRECTORY BROWSING (A5: Security Misconfiguration)
+# ═══════════════════════════════════════════════════════════════
+Options -Indexes
+
+# ═══════════════════════════════════════════════════════════════
+# BLOCK BAD BOTS & SCANNERS (A9: Logging & Monitoring)
+# ═══════════════════════════════════════════════════════════════
+
+RewriteCond %{HTTP_USER_AGENT} (havij|sqlmap|nikto|nmap|masscan|dirbuster|gobuster|wpscan|nessus|openvas|zmeu|morfeus|arachni|acunetix|w3af|skipfish|HTTrack|libwww-perl|python-requests|curl\/|wget\/|Go-http-client|scrapy) [NC,OR]
+RewriteCond %{HTTP_USER_AGENT} (AhrefsBot|SemrushBot|MJ12bot|DotBot|BLEXBot|SearchmetricsBot|YandexBot|PetalBot|barkrowler) [NC]
+RewriteRule .* - [F,L]
+
+# ═══════════════════════════════════════════════════════════════
+# BLOCK COMMON ATTACK PATTERNS IN QUERY STRINGS (A3: Injection)
+# ═══════════════════════════════════════════════════════════════
+
+RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} (\.\./|\.\.\\) [OR]
+RewriteCond %{QUERY_STRING} (localhost|loopback|127\.0\.0\.1) [NC,OR]
+RewriteCond %{QUERY_STRING} (\|cmd|exec|system|passthru|eval|base64) [NC,OR]
+RewriteCond %{QUERY_STRING} (union.*select|insert.*into|delete.*from|drop.*table|update.*set) [NC]
+RewriteRule .* - [F,L]
+
+# ═══════════════════════════════════════════════════════════════
+# BLOCK COMMON WORDPRESS ATTACK PATHS (Legacy Protection)
+# Since old site may have been WordPress, block common WP targets
+# ═══════════════════════════════════════════════════════════════
+
+RewriteRule ^wp-admin [F,L]
+RewriteRule ^wp-login\.php [F,L]
+RewriteRule ^wp-content [F,L]
+RewriteRule ^wp-includes [F,L]
+RewriteRule ^xmlrpc\.php [F,L]
+RewriteRule ^wp-cron\.php [F,L]
+
+# ═══════════════════════════════════════════════════════════════
+# SPA FALLBACK — React Router support
+# Must be LAST so security rules execute first
+# ═══════════════════════════════════════════════════════════════
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]

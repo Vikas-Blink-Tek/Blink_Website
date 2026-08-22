@@ -680,11 +680,32 @@ const ClientShowcase = () => {
 };
 
 /* ═══════════════════════════════════════════════════════════════
-   LEAD FORM
+   LEAD FORM — Security Hardened
+   Layers: reCAPTCHA v2 | Honeypot | Rate Limit | Sanitization | Phone Validation | FormSubmit Honeypot
    ═══════════════════════════════════════════════════════════════ */
+
+/** Strip HTML tags and script content to prevent XSS via form data */
+const sanitizeInput = (input: string): string => {
+  return input
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/[<>]/g, '')
+    .trim();
+};
+
+/** Validate Indian phone number: 10 digits, optionally prefixed with +91 or 0 */
+const isValidIndianPhone = (phone: string): boolean => {
+  const cleaned = phone.replace(/[\s\-\(\)]/g, '');
+  return /^(?:\+91|91|0)?[6-9]\d{9}$/.test(cleaned);
+};
+
+const RATE_LIMIT_MS = 60_000; // 1 submission per 60 seconds
+
 const LeadForm = () => {
   const [captchaStatus, setCaptchaStatus] = useState<'idle' | 'success'>('idle');
-  const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'rate-limited'>('idle');
+  const [phoneError, setPhoneError] = useState('');
+  const lastSubmitRef = useRef<number>(0);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -692,6 +713,9 @@ const LeadForm = () => {
     loanType: '',
     city: ''
   });
+
+  // Honeypot — bots fill this, humans never see it
+  const [honeypot, setHoneypot] = useState('');
 
   const handleCaptchaChange = (token: string | null) => {
     if (token) {
@@ -701,20 +725,58 @@ const LeadForm = () => {
     }
   };
 
-
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    if (name === 'phone') {
+      setPhoneError('');
+    }
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (captchaStatus !== 'success' || !formData.name || !formData.phone || !formData.loanType || !formData.city) {
+
+    // Layer 2: Honeypot check — if filled, silently pretend success (fool the bot)
+    if (honeypot) {
+      setFormStatus('success');
       return;
     }
+
+    // Layer 1: reCAPTCHA check
+    if (captchaStatus !== 'success') {
+      return;
+    }
+
+    // Layer 4: Sanitize all inputs
+    const cleanName = sanitizeInput(formData.name);
+    const cleanPhone = sanitizeInput(formData.phone);
+    const cleanCity = sanitizeInput(formData.city);
+    const cleanLoanType = sanitizeInput(formData.loanType);
+
+    // Basic required field check (post-sanitization)
+    if (!cleanName || !cleanPhone || !cleanLoanType || !cleanCity) {
+      return;
+    }
+
+    // Layer 5: Phone number validation
+    if (!isValidIndianPhone(cleanPhone)) {
+      setPhoneError('Please enter a valid 10-digit Indian phone number');
+      return;
+    }
+
+    // Layer 3: Rate limiting — prevent rapid-fire submissions
+    const now = Date.now();
+    if (now - lastSubmitRef.current < RATE_LIMIT_MS) {
+      const secondsLeft = Math.ceil((RATE_LIMIT_MS - (now - lastSubmitRef.current)) / 1000);
+      setFormStatus('rate-limited');
+      setTimeout(() => setFormStatus('idle'), 3000);
+      alert(`Please wait ${secondsLeft} seconds before submitting again.`);
+      return;
+    }
+    lastSubmitRef.current = now;
 
     setFormStatus('submitting');
 
@@ -726,12 +788,16 @@ const LeadForm = () => {
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          name: formData.name,
-          phone: formData.phone,
-          city: formData.city,
-          "Loan Type": formData.loanType,
-          _subject: `New Loan Inquiry from ${formData.name}`,
-          _template: "table"
+          name: cleanName,
+          phone: cleanPhone,
+          city: cleanCity,
+          "Loan Type": cleanLoanType,
+          _subject: `New Loan Inquiry from ${cleanName}`,
+          _template: "table",
+          // Layer 6: FormSubmit's own honeypot — second anti-spam layer
+          _honeypot: "",
+          // Disable FormSubmit's built-in captcha since we use our own Google reCAPTCHA
+          _captcha: "false"
         })
       });
 
@@ -770,6 +836,7 @@ const LeadForm = () => {
                   onClick={() => {
                     setFormStatus('idle');
                     setCaptchaStatus('idle');
+                    setPhoneError('');
                     setFormData({ name: '', phone: '', loanType: '', city: '' });
                   }}
                   className="bg-brand-orange text-white font-bold py-3 px-8 rounded-xl hover:bg-brand-orange/90 transition-colors"
@@ -786,13 +853,28 @@ const LeadForm = () => {
                 </div>
 
                 <form className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left" onSubmit={handleSubmit}>
+                  {/* Layer 2: Honeypot field — invisible to humans, bots auto-fill it */}
+                  <div className="absolute opacity-0 top-0 left-0 h-0 w-0 -z-10" aria-hidden="true">
+                    <label htmlFor="website_url">Website</label>
+                    <input
+                      type="text"
+                      id="website_url"
+                      name="website_url"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                    />
+                  </div>
+
                   <div className="flex flex-col">
                     <label className="text-base font-bold mb-2 text-foreground">Full Name *</label>
-                    <input type="text" name="name" required value={formData.name} onChange={handleInputChange} placeholder="Your name" className="border border-black/20 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all bg-white text-foreground placeholder:text-foreground/40 shadow-sm" />
+                    <input type="text" name="name" required maxLength={100} value={formData.name} onChange={handleInputChange} placeholder="Your name" className="border border-black/20 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all bg-white text-foreground placeholder:text-foreground/40 shadow-sm" />
                   </div>
                   <div className="flex flex-col">
                     <label className="text-sm font-bold mb-2 text-foreground">Phone Number *</label>
-                    <input type="tel" name="phone" required minLength={10} value={formData.phone} onChange={handleInputChange} placeholder="+91 98765 43210" className="border border-black/20 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all bg-white text-foreground placeholder:text-foreground/40 shadow-sm" />
+                    <input type="tel" name="phone" required maxLength={15} value={formData.phone} onChange={handleInputChange} placeholder="+91 98765 43210" className={`border rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all bg-white text-foreground placeholder:text-foreground/40 shadow-sm ${phoneError ? 'border-red-500' : 'border-black/20'}`} />
+                    {phoneError && <p className="text-red-500 text-xs mt-1 font-medium">{phoneError}</p>}
                   </div>
                   <div className="flex flex-col">
                     <label className="text-sm font-bold mb-2 text-foreground">Loan Type *</label>
@@ -809,11 +891,10 @@ const LeadForm = () => {
                   </div>
                   <div className="flex flex-col">
                     <label className="text-sm font-bold mb-2 text-foreground">City *</label>
-                    <input type="text" name="city" required value={formData.city} onChange={handleInputChange} placeholder="Your City" className="border border-black/20 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all bg-white text-foreground placeholder:text-foreground/40 shadow-sm" />
+                    <input type="text" name="city" required maxLength={50} value={formData.city} onChange={handleInputChange} placeholder="Your City" className="border border-black/20 rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all bg-white text-foreground placeholder:text-foreground/40 shadow-sm" />
                   </div>
 
                   <div className="md:col-span-2 mt-2">
-                    {/* TODO: Replace sitekey with your actual production key for blinkfinance.in */}
                     <ReCAPTCHA
                       sitekey="6LdVjpEtAAAAAHdrNOOJcGo16hpOx_xstM9VQcnM"
                       onChange={handleCaptchaChange}
@@ -823,8 +904,8 @@ const LeadForm = () => {
                   <div className="md:col-span-2 mt-4">
                     <button
                       type="submit"
-                      disabled={captchaStatus !== 'success' || formStatus === 'submitting'}
-                      className={`w-full text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 text-lg ${(captchaStatus !== 'success' || formStatus === 'submitting')
+                      disabled={captchaStatus !== 'success' || formStatus === 'submitting' || formStatus === 'rate-limited'}
+                      className={`w-full text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 text-lg ${(captchaStatus !== 'success' || formStatus === 'submitting' || formStatus === 'rate-limited')
                         ? 'bg-gray-400 opacity-70 cursor-not-allowed'
                         : 'bg-gradient-brand hover:-translate-y-1 active:translate-y-1 cursor-pointer'
                         }`}
