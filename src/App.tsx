@@ -683,7 +683,7 @@ const ClientShowcase = () => {
    LEAD FORM
    ═══════════════════════════════════════════════════════════════ */
 const LeadForm = () => {
-  const [captchaStatus, setCaptchaStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [captchaStatus, setCaptchaStatus] = useState<'idle' | 'success'>('idle');
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
 
   const [formData, setFormData] = useState({
@@ -701,6 +701,8 @@ const LeadForm = () => {
     }
   };
 
+
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
@@ -717,7 +719,7 @@ const LeadForm = () => {
     setFormStatus('submitting');
 
     try {
-      const response = await fetch("https://formsubmit.co/ajax/info@blinkfinance.in", {
+      const response = await fetch("https://formsubmit.co/ajax/associates@blinkfinance.in", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
@@ -811,8 +813,9 @@ const LeadForm = () => {
                   </div>
 
                   <div className="md:col-span-2 mt-2">
+                    {/* TODO: Replace sitekey with your actual production key for blinkfinance.in */}
                     <ReCAPTCHA
-                      sitekey="6Ld4TYotAAAAADzwB9MZV1kYwJ3tTx5bQiYy9GT"
+                      sitekey="6LdVjpEtAAAAAHdrNOOJcGo16hpOx_xstM9VQcnM"
                       onChange={handleCaptchaChange}
                     />
                   </div>
