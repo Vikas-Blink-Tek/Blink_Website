@@ -135,3 +135,49 @@
   background-position: center;
   opacity: 0.8;
 }
+
+.emi-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+}
+
+.emi-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 3px solid #EA580C;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.35);
+  cursor: pointer;
+}
+
+.emi-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 3px solid #EA580C;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.35);
+  cursor: pointer;
+}
+
+.emi-slider:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.2);
+}
+
+input[type='number'].emi-number::-webkit-outer-spin-button,
+input[type='number'].emi-number::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'].emi-number {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
