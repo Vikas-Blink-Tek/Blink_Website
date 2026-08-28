@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import {
   CheckCircle2,
@@ -948,9 +948,25 @@ function HomePage() {
   );
 }
 
+function MetaPixelPageViews() {
+  const location = useLocation();
+  const isFirstLoad = useRef(true);
+
+  useEffect(() => {
+    if (isFirstLoad.current) {
+      isFirstLoad.current = false;
+      return;
+    }
+    window.fbq?.('track', 'PageView');
+  }, [location.pathname]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <MetaPixelPageViews />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/emi-calculator" element={<EmiCalculatorPage />} />
