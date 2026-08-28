@@ -17,7 +17,8 @@ import {
   compactINR,
   dateFromMonthInput,
   formatINR,
-  formatMonthLabel,
+  formatMonthShort,
+  formatPaidPct,
   monthInputValue,
   type EmiScheme,
   type LoanType,
@@ -217,9 +218,8 @@ export default function EmiCalculatorPage() {
   const [tenure, setTenure] = useState(config.tenureYearsDefault);
   const [scheme, setScheme] = useState<EmiScheme>('arrears');
   const [yearMode, setYearMode] = useState<YearMode>('calendar');
-  const [scheduleView, setScheduleView] = useState<'monthly' | 'yearly'>('monthly');
   const [startMonth, setStartMonth] = useState(currentMonthValue);
-  const [expandedYear, setExpandedYear] = useState<string | null>(null);
+  const [expandedYears, setExpandedYears] = useState<Set<string>>(new Set());
 
   const [leadOpen, setLeadOpen] = useState(false);
   const [leadName, setLeadName] = useState('');
@@ -263,6 +263,21 @@ export default function EmiCalculatorPage() {
       }),
     [principal, rate, months, scheme, config.showAdvanceScheme, startMonth, yearMode]
   );
+
+  useEffect(() => {
+    setExpandedYears(new Set(result.years[0] ? [result.years[0].label] : []));
+  }, [result.years]);
+
+  const toggleYear = (label: string) => {
+    setExpandedYears((prev) => {
+      const next = new Set(prev);
+      if (next.has(label)) next.delete(label);
+      else next.add(label);
+      return next;
+    });
+  };
+
+  const allYearsExpanded = result.years.length > 0 && result.years.every((year) => expandedYears.has(year.label));
 
   const amountTicks = [0, 0.25, 0.5, 0.75, 1].map((p) => {
     const value = config.amountMin + (config.amountMax - config.amountMin) * p;
@@ -581,6 +596,9 @@ export default function EmiCalculatorPage() {
             <div>
               <p className="text-brand-orange font-bold text-sm tracking-widest uppercase mb-2">Repayment Schedule</p>
               <h2 className="text-3xl md:text-4xl font-black font-display">Your EMI break-up</h2>
+              <p className="text-sm text-foreground/60 font-medium mt-2 max-w-xl">
+                Each EMI is Principal (A) + Interest (B). Click <span className="font-bold text-foreground">+</span> on a year to see every month.
+              </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <label className="flex items-center gap-2 text-sm font-bold text-foreground/70">
@@ -592,23 +610,6 @@ export default function EmiCalculatorPage() {
                   className="border border-black/10 rounded-xl px-3 py-2 bg-slate-50 font-bold text-foreground"
                 />
               </label>
-              <div className="flex rounded-full bg-slate-100 p-1">
-                {([
-                  { id: 'monthly', label: 'Monthly' },
-                  { id: 'yearly', label: 'Yearly' },
-                ] as const).map((option) => (
-                  <button
-                    key={option.id}
-                    type="button"
-                    onClick={() => setScheduleView(option.id)}
-                    className={`px-4 py-2 rounded-full text-xs font-bold ${
-                      scheduleView === option.id ? 'bg-foreground text-white' : 'text-foreground/60'
-                    }`}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
               <div className="flex rounded-full bg-slate-100 p-1">
                 {([
                   { id: 'calendar', label: 'Calendar Year' },
@@ -626,6 +627,16 @@ export default function EmiCalculatorPage() {
                   </button>
                 ))}
               </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (allYearsExpanded) setExpandedYears(new Set());
+                  else setExpandedYears(new Set(result.years.map((year) => year.label)));
+                }}
+                className="px-4 py-2 rounded-full text-xs font-bold border border-black/10 bg-white hover:border-brand-orange/40"
+              >
+                {allYearsExpanded ? 'Collapse all' : 'Expand all months'}
+              </button>
             </div>
           </div>
 
@@ -648,69 +659,74 @@ export default function EmiCalculatorPage() {
             </div>
           )}
 
-          <div className="overflow-x-auto max-h-[36rem] overflow-y-auto">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-white z-10">
-                <tr className="text-left text-xs uppercase tracking-wider text-foreground/50 border-b border-black/10">
-                  <th className="py-3 pr-4">{scheduleView === 'monthly' ? 'Month' : 'Year'}</th>
-                  <th className="py-3 pr-4 text-right">Principal</th>
-                  <th className="py-3 pr-4 text-right">Interest</th>
-                  <th className="py-3 pr-4 text-right">{scheduleView === 'monthly' ? 'Monthly EMI' : 'Year total'}</th>
-                  <th className="py-3 text-right">Balance</th>
+          <div className="overflow-x-auto max-h-[36rem] overflow-y-auto rounded-xl border border-black/10">
+            <table className="w-full text-sm min-w-[760px]">
+              <thead className="sticky top-0 z-10">
+                <tr className="text-center text-[11px] font-bold uppercase tracking-wide">
+                  <th className="py-3 px-3 text-left bg-slate-100 text-foreground">Year</th>
+                  <th className="py-3 px-3 text-right bg-amber-600 text-white">Principal (A)</th>
+                  <th className="py-3 px-3 text-right bg-brand-orange text-white">Interest (B)</th>
+                  <th className="py-3 px-3 text-right bg-slate-200 text-foreground">Total Payment (A + B)</th>
+                  <th className="py-3 px-3 text-right bg-rose-600 text-white">Balance</th>
+                  <th className="py-3 px-3 text-right bg-foreground text-white">Loan Paid To Date</th>
                 </tr>
               </thead>
               <tbody>
-                {scheduleView === 'monthly'
-                  ? result.years.map((year) => (
-                      <Fragment key={year.label}>
-                        <tr className="bg-slate-50 border-b border-black/5">
-                          <td colSpan={5} className="py-2 pr-4 font-black text-xs uppercase tracking-widest text-foreground/50">
+                {result.years.map((year, yearIndex) => {
+                  const open = expandedYears.has(year.label);
+                  return (
+                    <Fragment key={year.label}>
+                      <tr
+                        className={`border-b border-black/5 cursor-pointer ${yearIndex % 2 === 0 ? 'bg-white' : 'bg-slate-50'} hover:bg-orange-50/60`}
+                        onClick={() => toggleYear(year.label)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            toggleYear(year.label);
+                          }
+                        }}
+                        tabIndex={0}
+                        aria-expanded={open}
+                      >
+                        <td className="py-3 px-3 font-bold">
+                          <span className="inline-flex items-center gap-2">
+                            <span className="inline-flex w-5 h-5 items-center justify-center rounded-sm border border-black/25 text-xs font-black leading-none bg-white">
+                              {open ? '−' : '+'}
+                            </span>
                             {year.label}
-                          </td>
-                        </tr>
-                        {year.months.map((row) => (
-                          <tr key={`${year.label}-${row.monthIndex}`} className="border-b border-black/5 text-foreground/80">
-                            <td className="py-2.5 pr-4 font-semibold">{formatMonthLabel(row.date)}</td>
-                            <td className="py-2.5 pr-4 text-right">{formatINR(row.principal)}</td>
-                            <td className="py-2.5 pr-4 text-right text-brand-orange">{formatINR(row.interest)}</td>
-                            <td className="py-2.5 pr-4 text-right font-bold">{formatINR(row.emi)}</td>
-                            <td className="py-2.5 text-right">{formatINR(row.balance)}</td>
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 text-right font-semibold">{formatINR(year.principal)}</td>
+                        <td className="py-3 px-3 text-right font-semibold text-brand-orange">{formatINR(year.interest)}</td>
+                        <td className="py-3 px-3 text-right font-semibold">{formatINR(year.emiTotal)}</td>
+                        <td className="py-3 px-3 text-right font-semibold">{formatINR(year.closingBalance)}</td>
+                        <td className="py-3 px-3 text-right font-semibold">{formatPaidPct(year.paidToDatePct)}</td>
+                      </tr>
+                      {open &&
+                        year.months.map((row, monthIndex) => (
+                          <tr
+                            key={`${year.label}-${row.monthIndex}`}
+                            className={`border-b border-black/5 text-foreground/80 ${monthIndex % 2 === 0 ? 'bg-orange-50/40' : 'bg-white'}`}
+                          >
+                            <td className="py-2 px-3 pl-12">{formatMonthShort(row.date)}</td>
+                            <td className="py-2 px-3 text-right">{formatINR(row.principal)}</td>
+                            <td className="py-2 px-3 text-right text-brand-orange">{formatINR(row.interest)}</td>
+                            <td className="py-2 px-3 text-right">{formatINR(row.emi)}</td>
+                            <td className="py-2 px-3 text-right">{formatINR(row.balance)}</td>
+                            <td className="py-2 px-3 text-right">{formatPaidPct(row.paidToDatePct)}</td>
                           </tr>
                         ))}
-                      </Fragment>
-                    ))
-                  : result.years.map((year) => (
-                      <Fragment key={year.label}>
-                        <tr
-                          className="border-b border-black/5 hover:bg-slate-50 cursor-pointer"
-                          onClick={() => setExpandedYear(expandedYear === year.label ? null : year.label)}
-                        >
-                          <td className="py-3 pr-4 font-bold">{year.label}</td>
-                          <td className="py-3 pr-4 text-right font-medium">{formatINR(year.principal)}</td>
-                          <td className="py-3 pr-4 text-right font-medium text-brand-orange">{formatINR(year.interest)}</td>
-                          <td className="py-3 pr-4 text-right font-medium">{formatINR(year.emiTotal)}</td>
-                          <td className="py-3 text-right font-medium">{formatINR(year.closingBalance)}</td>
-                        </tr>
-                        {expandedYear === year.label &&
-                          year.months.map((row) => (
-                            <tr key={`${year.label}-${row.monthIndex}`} className="bg-slate-50/80 text-foreground/70">
-                              <td className="py-2 pr-4 pl-4">{formatMonthLabel(row.date)}</td>
-                              <td className="py-2 pr-4 text-right">{formatINR(row.principal)}</td>
-                              <td className="py-2 pr-4 text-right">{formatINR(row.interest)}</td>
-                              <td className="py-2 pr-4 text-right">{formatINR(row.emi)}</td>
-                              <td className="py-2 text-right">{formatINR(row.balance)}</td>
-                            </tr>
-                          ))}
-                      </Fragment>
-                    ))}
+                    </Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-foreground/40 mt-4 font-medium">
-            {scheduleView === 'monthly'
-              ? 'Each row is one monthly EMI. Banks use the reducing-balance method: interest is charged only on the outstanding principal that month.'
-              : 'Year totals are the sum of 12 monthly EMIs. Tap a year to see the month-wise break-up.'}
-          </p>
+          <div className="mt-4 grid sm:grid-cols-3 gap-3 text-xs font-medium text-foreground/60">
+            <p><span className="font-bold text-amber-700">Principal (A)</span> — the part that reduces your loan.</p>
+            <p><span className="font-bold text-brand-orange">Interest (B)</span> — the charge on the remaining balance that month.</p>
+            <p><span className="font-bold text-foreground">A + B</span> — your fixed monthly EMI. Paid to date is how much of the original loan is cleared.</p>
+          </div>
         </div>
       </section>
 

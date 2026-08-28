@@ -1,6 +1,6 @@
 import jsPDF, { GState } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { formatMonthLabel, type EmiResult, type LoanConfig, type EmiScheme } from './emi';
+import { formatMonthYearDash, formatPaidPct, type EmiResult, type LoanConfig, type EmiScheme } from './emi';
 
 const ORANGE: [number, number, number] = [234, 88, 12];
 const DARK: [number, number, number] = [15, 23, 42];
@@ -246,39 +246,77 @@ export async function downloadEmiPdf(input: EmiPdfInput): Promise<void> {
   doc.setFont(FONT, 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...DARK);
-  doc.text('Month-wise payment schedule', 12, tableStart);
+  doc.text('Loan Amortization Schedule', 12, tableStart);
+  doc.setFont(FONT, 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(...MUTED);
+  doc.text('Each EMI = Principal (A) + Interest (B). Balance is what remains after that month.', 12, tableStart + 5);
+
+  const GOLD: [number, number, number] = [202, 138, 4];
+  const PINK: [number, number, number] = [225, 29, 72];
 
   autoTable(doc, {
-    startY: tableStart + 4,
-    head: [['Month', 'Principal (Rs.)', 'Interest (Rs.)', 'Monthly EMI (Rs.)', 'Balance (Rs.)']],
+    startY: tableStart + 8,
+    head: [[
+      'Month #',
+      'Month & Year',
+      'Principal (A)',
+      'Interest (B)',
+      'Total Payment (A+B)',
+      'Outstanding Balance',
+      'Loan Paid To Date',
+    ]],
     body: input.result.schedule.map((row) => [
-      formatMonthLabel(row.date),
+      String(row.monthIndex),
+      formatMonthYearDash(row.date),
       formatIndianNumber(row.principal),
       formatIndianNumber(row.interest),
       formatIndianNumber(row.emi),
       formatIndianNumber(row.balance),
+      formatPaidPct(row.paidToDatePct),
     ]),
-    theme: 'striped',
-    styles: { font: FONT, fontSize: 8, cellPadding: 2.2, overflow: 'linebreak' },
+    theme: 'grid',
+    styles: { font: FONT, fontSize: 7, cellPadding: 1.6, overflow: 'linebreak', textColor: DARK, lineColor: [226, 232, 240], lineWidth: 0.2 },
     headStyles: {
-      fillColor: DARK,
-      textColor: [255, 255, 255],
       font: FONT,
       fontStyle: 'bold',
-      fontSize: 7.5,
-      halign: 'right',
+      fontSize: 6.5,
+      halign: 'center',
+      valign: 'middle',
+      textColor: [255, 255, 255],
     },
-    bodyStyles: { font: FONT, textColor: DARK },
+    bodyStyles: { font: FONT, textColor: DARK, halign: 'right' },
     columnStyles: {
-      0: { cellWidth: 32, halign: 'left', fontStyle: 'bold' },
-      1: { cellWidth: 38, halign: 'right' },
-      2: { cellWidth: 38, halign: 'right' },
-      3: { cellWidth: 42, halign: 'right' },
-      4: { cellWidth: 36, halign: 'right' },
+      0: { cellWidth: 16, halign: 'center' },
+      1: { cellWidth: 26, halign: 'left', fontStyle: 'bold' },
+      2: { cellWidth: 28, halign: 'right' },
+      3: { cellWidth: 26, halign: 'right' },
+      4: { cellWidth: 32, halign: 'right' },
+      5: { cellWidth: 32, halign: 'right' },
+      6: { cellWidth: 26, halign: 'right' },
     },
     didParseCell: (data) => {
-      if (data.section === 'head' && data.column.index === 0) {
-        data.cell.styles.halign = 'left';
+      if (data.section === 'head') {
+        const fills: [number, number, number][] = [
+          [241, 245, 249],
+          [241, 245, 249],
+          GOLD,
+          ORANGE,
+          [148, 163, 184],
+          PINK,
+          DARK,
+        ];
+        const text: [number, number, number][] = [
+          DARK,
+          DARK,
+          [255, 255, 255],
+          [255, 255, 255],
+          [255, 255, 255],
+          [255, 255, 255],
+          [255, 255, 255],
+        ];
+        data.cell.styles.fillColor = fills[data.column.index];
+        data.cell.styles.textColor = text[data.column.index];
       }
     },
     alternateRowStyles: { fillColor: [248, 250, 252] },

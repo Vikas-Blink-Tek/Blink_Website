@@ -68,6 +68,7 @@ export interface MonthRow {
   principal: number;
   interest: number;
   balance: number;
+  paidToDatePct: number;
 }
 
 export interface YearGroup {
@@ -76,6 +77,7 @@ export interface YearGroup {
   interest: number;
   emiTotal: number;
   closingBalance: number;
+  paidToDatePct: number;
   months: MonthRow[];
 }
 
@@ -202,13 +204,17 @@ export function buildSchedule(
     balance = Math.max(0, balance - principalPaid);
     if (isLast) balance = 0;
 
+    const remaining = Math.max(0, balance);
+    const paidToDatePct = principal > 0 ? ((principal - remaining) / principal) * 100 : 0;
+
     rows.push({
       monthIndex: i,
       date: addMonths(startDate, i - 1),
       emi: roundRupee(payment),
       principal: roundRupee(principalPaid),
       interest: roundRupee(interest),
-      balance: roundRupee(balance),
+      balance: roundRupee(remaining),
+      paidToDatePct,
     });
   }
 
@@ -229,6 +235,7 @@ export function groupSchedule(schedule: MonthRow[], mode: YearMode): YearGroup[]
       existing.interest += row.interest;
       existing.emiTotal += row.emi;
       existing.closingBalance = row.balance;
+      existing.paidToDatePct = row.paidToDatePct;
       existing.months.push(row);
     } else {
       map.set(label, {
@@ -237,6 +244,7 @@ export function groupSchedule(schedule: MonthRow[], mode: YearMode): YearGroup[]
         interest: row.interest,
         emiTotal: row.emi,
         closingBalance: row.balance,
+        paidToDatePct: row.paidToDatePct,
         months: [row],
       });
     }
@@ -296,4 +304,16 @@ export function dateFromMonthInput(value: string): Date {
 
 export function formatMonthLabel(date: Date): string {
   return date.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+}
+
+export function formatMonthShort(date: Date): string {
+  return date.toLocaleDateString('en-GB', { month: 'short' });
+}
+
+export function formatMonthYearDash(date: Date): string {
+  return `${formatMonthShort(date)}-${date.getFullYear()}`;
+}
+
+export function formatPaidPct(value: number): string {
+  return `${value.toFixed(2)}%`;
 }
