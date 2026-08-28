@@ -25,7 +25,14 @@ export default function Footer() {
             <div className="grid md:grid-cols-2 gap-10">
               <div className="flex flex-col">
                 <div className="flex items-center gap-4 mb-8">
-                  <img src="/new_logo.png" alt="Blink Finance logo - trusted loan DSA partner in India" loading="lazy" className="h-24 w-auto object-contain drop-shadow-xl brightness-0 invert" />
+                  <img
+                    src="/new_logo.png"
+                    alt="Blink Finance logo - trusted loan DSA partner in India"
+                    width={1602}
+                    height={888}
+                    loading="lazy"
+                    className="h-24 w-auto object-contain drop-shadow-xl brightness-0 invert"
+                  />
                 </div>
                 <p className="text-white/90 mb-8 leading-relaxed text-base font-medium">Right Credit. Not Just Random Loans. Your trusted DSA partner bridging the gap between you and your financial goals.</p>
                 <div className="flex gap-4 mt-auto">

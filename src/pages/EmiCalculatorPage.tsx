@@ -17,6 +17,7 @@ import {
   compactINR,
   dateFromMonthInput,
   formatINR,
+  formatMonthLabel,
   monthInputValue,
   type EmiScheme,
   type LoanType,
@@ -216,6 +217,7 @@ export default function EmiCalculatorPage() {
   const [tenure, setTenure] = useState(config.tenureYearsDefault);
   const [scheme, setScheme] = useState<EmiScheme>('arrears');
   const [yearMode, setYearMode] = useState<YearMode>('calendar');
+  const [scheduleView, setScheduleView] = useState<'monthly' | 'yearly'>('monthly');
   const [startMonth, setStartMonth] = useState(currentMonthValue);
   const [expandedYear, setExpandedYear] = useState<string | null>(null);
 
@@ -531,8 +533,9 @@ export default function EmiCalculatorPage() {
             <div className="bg-white rounded-[2rem] border border-black/10 shadow-xl p-6 md:p-8">
               <div className="grid grid-cols-1 gap-4">
                 <div className="rounded-2xl bg-slate-50 border border-black/5 p-5">
-                  <p className="text-xs font-bold uppercase tracking-widest text-foreground/50 mb-1">Loan EMI</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-foreground/50 mb-1">Monthly EMI</p>
                   <p className="text-4xl font-black font-display text-foreground">{formatINR(result.emi)}</p>
+                  <p className="text-xs font-semibold text-foreground/45 mt-1">Payable every month</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-2xl bg-orange-50 border border-brand-orange/10 p-5">
@@ -591,6 +594,23 @@ export default function EmiCalculatorPage() {
               </label>
               <div className="flex rounded-full bg-slate-100 p-1">
                 {([
+                  { id: 'monthly', label: 'Monthly' },
+                  { id: 'yearly', label: 'Yearly' },
+                ] as const).map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setScheduleView(option.id)}
+                    className={`px-4 py-2 rounded-full text-xs font-bold ${
+                      scheduleView === option.id ? 'bg-foreground text-white' : 'text-foreground/60'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex rounded-full bg-slate-100 p-1">
+                {([
                   { id: 'calendar', label: 'Calendar Year' },
                   { id: 'financial', label: 'Financial Year' },
                 ] as const).map((option) => (
@@ -628,48 +648,69 @@ export default function EmiCalculatorPage() {
             </div>
           )}
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto max-h-[36rem] overflow-y-auto">
             <table className="w-full text-sm">
-              <thead>
+              <thead className="sticky top-0 bg-white z-10">
                 <tr className="text-left text-xs uppercase tracking-wider text-foreground/50 border-b border-black/10">
-                  <th className="py-3 pr-4">Year</th>
+                  <th className="py-3 pr-4">{scheduleView === 'monthly' ? 'Month' : 'Year'}</th>
                   <th className="py-3 pr-4 text-right">Principal</th>
                   <th className="py-3 pr-4 text-right">Interest</th>
-                  <th className="py-3 pr-4 text-right">Total Payment</th>
+                  <th className="py-3 pr-4 text-right">{scheduleView === 'monthly' ? 'Monthly EMI' : 'Year total'}</th>
                   <th className="py-3 text-right">Balance</th>
                 </tr>
               </thead>
               <tbody>
-                {result.years.map((year) => (
-                  <Fragment key={year.label}>
-                    <tr
-                      className="border-b border-black/5 hover:bg-slate-50 cursor-pointer"
-                      onClick={() => setExpandedYear(expandedYear === year.label ? null : year.label)}
-                    >
-                      <td className="py-3 pr-4 font-bold">{year.label}</td>
-                      <td className="py-3 pr-4 text-right font-medium">{formatINR(year.principal)}</td>
-                      <td className="py-3 pr-4 text-right font-medium text-brand-orange">{formatINR(year.interest)}</td>
-                      <td className="py-3 pr-4 text-right font-medium">{formatINR(year.emiTotal)}</td>
-                      <td className="py-3 text-right font-medium">{formatINR(year.closingBalance)}</td>
-                    </tr>
-                    {expandedYear === year.label &&
-                      year.months.map((row) => (
-                        <tr key={`${year.label}-${row.monthIndex}`} className="bg-slate-50/80 text-foreground/70">
-                          <td className="py-2 pr-4 pl-4">
-                            {row.date.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}
+                {scheduleView === 'monthly'
+                  ? result.years.map((year) => (
+                      <Fragment key={year.label}>
+                        <tr className="bg-slate-50 border-b border-black/5">
+                          <td colSpan={5} className="py-2 pr-4 font-black text-xs uppercase tracking-widest text-foreground/50">
+                            {year.label}
                           </td>
-                          <td className="py-2 pr-4 text-right">{formatINR(row.principal)}</td>
-                          <td className="py-2 pr-4 text-right">{formatINR(row.interest)}</td>
-                          <td className="py-2 pr-4 text-right">{formatINR(row.emi)}</td>
-                          <td className="py-2 text-right">{formatINR(row.balance)}</td>
                         </tr>
-                      ))}
-                  </Fragment>
-                ))}
+                        {year.months.map((row) => (
+                          <tr key={`${year.label}-${row.monthIndex}`} className="border-b border-black/5 text-foreground/80">
+                            <td className="py-2.5 pr-4 font-semibold">{formatMonthLabel(row.date)}</td>
+                            <td className="py-2.5 pr-4 text-right">{formatINR(row.principal)}</td>
+                            <td className="py-2.5 pr-4 text-right text-brand-orange">{formatINR(row.interest)}</td>
+                            <td className="py-2.5 pr-4 text-right font-bold">{formatINR(row.emi)}</td>
+                            <td className="py-2.5 text-right">{formatINR(row.balance)}</td>
+                          </tr>
+                        ))}
+                      </Fragment>
+                    ))
+                  : result.years.map((year) => (
+                      <Fragment key={year.label}>
+                        <tr
+                          className="border-b border-black/5 hover:bg-slate-50 cursor-pointer"
+                          onClick={() => setExpandedYear(expandedYear === year.label ? null : year.label)}
+                        >
+                          <td className="py-3 pr-4 font-bold">{year.label}</td>
+                          <td className="py-3 pr-4 text-right font-medium">{formatINR(year.principal)}</td>
+                          <td className="py-3 pr-4 text-right font-medium text-brand-orange">{formatINR(year.interest)}</td>
+                          <td className="py-3 pr-4 text-right font-medium">{formatINR(year.emiTotal)}</td>
+                          <td className="py-3 text-right font-medium">{formatINR(year.closingBalance)}</td>
+                        </tr>
+                        {expandedYear === year.label &&
+                          year.months.map((row) => (
+                            <tr key={`${year.label}-${row.monthIndex}`} className="bg-slate-50/80 text-foreground/70">
+                              <td className="py-2 pr-4 pl-4">{formatMonthLabel(row.date)}</td>
+                              <td className="py-2 pr-4 text-right">{formatINR(row.principal)}</td>
+                              <td className="py-2 pr-4 text-right">{formatINR(row.interest)}</td>
+                              <td className="py-2 pr-4 text-right">{formatINR(row.emi)}</td>
+                              <td className="py-2 text-right">{formatINR(row.balance)}</td>
+                            </tr>
+                          ))}
+                      </Fragment>
+                    ))}
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-foreground/40 mt-4 font-medium">Tap a year row to view the month-wise break-up. Figures are rounded to the nearest rupee.</p>
+          <p className="text-xs text-foreground/40 mt-4 font-medium">
+            {scheduleView === 'monthly'
+              ? 'Each row is one monthly EMI. Banks use the reducing-balance method: interest is charged only on the outstanding principal that month.'
+              : 'Year totals are the sum of 12 monthly EMIs. Tap a year to see the month-wise break-up.'}
+          </p>
         </div>
       </section>
 
@@ -694,7 +735,7 @@ export default function EmiCalculatorPage() {
                 <li><span className="font-bold text-foreground">n</span> — tenure in months</li>
               </ul>
               <p className="mt-4 text-base">
-                Example: ₹10,00,000 at 10.5% for 10 years gives a monthly EMI of about ₹13,493. Over 120 months you repay about ₹16,19,220, of which ₹6,19,220 is interest.
+                Example: ₹10,00,000 at 10.5% for 10 years is a <span className="font-bold text-foreground">monthly EMI of ₹13,493</span> — the same figure SBI, HDFC, and emicalculator.net show. Over 120 months you repay ₹16,19,220, of which ₹6,19,220 is interest.
               </p>
             </div>
             <p>

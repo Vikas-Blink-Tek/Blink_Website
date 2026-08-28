@@ -1,0 +1,48 @@
+---
+description: Hostinger public_html deploy zip layout — always match this structure
+alwaysApply: true
+---
+
+# Hostinger deploy zip
+
+When the user asks for a deploy zip, produce `blinkfinance-public_html.zip` as a **flat `public_html` dump** (zip root = site root). Never wrap files in `dist/`, `build/`, or a named folder.
+
+## Canonical `public_html` layout (do not invent a different tree)
+
+```
+public_html/
+  api/            ← server-only; never delete; do not put in the React zip
+  lms/            ← server-only; never delete; do not put in the React zip
+  assets/
+  banks/
+  clients/
+  directors/
+  fonts/
+  loans/
+  .htaccess
+  apply.html      ← server-only; leave on host
+  contact.html    ← server-only; leave on host
+  insurance.html  ← server-only; leave on host
+  enquiry.php     ← server-only; leave on host
+  send.php        ← server-only; leave on host
+  index.html
+  favicon.png
+  icons.svg
+  new_logo.png
+  robots.txt
+  sitemap.xml
+  Scene.json
+  business_bg_3d.jpg
+  main_office_3d.jpg
+  ChatGPT_Image_Aug_16__2026__11_53_29_PM-removebg-preview.png
+```
+
+## How to build the zip
+
+1. `npm run build`
+2. Zip **contents of `dist/`** (including `.htaccess`), not the `dist` folder itself.
+3. Extract instructions: inside `public_html`, overwrite, then delete the zip on the server.
+
+## Extra files
+
+If the build adds a file/folder **not** in the layout above, still include it in the zip if the site needs it, and **tell the user by name** what is new, why it is needed, and that they should overwrite/extract it. Do not silently change the expected tree.

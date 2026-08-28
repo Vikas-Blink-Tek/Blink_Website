@@ -1,6 +1,6 @@
-import jsPDF from 'jspdf';
+import jsPDF, { GState } from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import type { EmiResult, LoanConfig, EmiScheme } from './emi';
+import { formatMonthLabel, type EmiResult, type LoanConfig, type EmiScheme } from './emi';
 
 const ORANGE: [number, number, number] = [234, 88, 12];
 const DARK: [number, number, number] = [15, 23, 42];
@@ -20,77 +20,68 @@ function formatPdfINR(amount: number): string {
   return `Rs. ${formatIndianNumber(amount)}`;
 }
 
-async function loadLogoAssets(): Promise<{
-  header: { dataUrl: string; width: number; height: number };
-  watermark: { dataUrl: string; width: number; height: number };
-} | null> {
+async function loadImage(src: string): Promise<HTMLImageElement | null> {
   try {
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = '/new_logo.png';
+    img.src = src;
     await img.decode();
-
-    const pad = 8;
-    const headerCanvas = document.createElement('canvas');
-    headerCanvas.width = img.naturalWidth + pad * 2;
-    headerCanvas.height = img.naturalHeight + pad * 2;
-    const headerCtx = headerCanvas.getContext('2d');
-    if (!headerCtx) return null;
-    headerCtx.fillStyle = '#ffffff';
-    headerCtx.fillRect(0, 0, headerCanvas.width, headerCanvas.height);
-    headerCtx.drawImage(img, pad, pad);
-
-    const bWidth = Math.round(img.naturalWidth * (105 / 267));
-    const bHeight = img.naturalHeight;
-    const targetHeight = 2400;
-    const targetWidth = Math.round(targetHeight * (bWidth / bHeight));
-
-    let stage = document.createElement('canvas');
-    stage.width = bWidth;
-    stage.height = bHeight;
-    const stageCtx = stage.getContext('2d');
-    if (!stageCtx) return null;
-    stageCtx.imageSmoothingEnabled = true;
-    stageCtx.imageSmoothingQuality = 'high';
-    stageCtx.drawImage(img, 0, 0, bWidth, bHeight, 0, 0, bWidth, bHeight);
-
-    while (stage.width * 2 <= targetWidth && stage.height * 2 <= targetHeight) {
-      const next = document.createElement('canvas');
-      next.width = stage.width * 2;
-      next.height = stage.height * 2;
-      const nextCtx = next.getContext('2d');
-      if (!nextCtx) break;
-      nextCtx.imageSmoothingEnabled = true;
-      nextCtx.imageSmoothingQuality = 'high';
-      nextCtx.drawImage(stage, 0, 0, next.width, next.height);
-      stage = next;
-    }
-
-    const markCanvas = document.createElement('canvas');
-    markCanvas.width = targetWidth;
-    markCanvas.height = targetHeight;
-    const markCtx = markCanvas.getContext('2d');
-    if (!markCtx) return null;
-    markCtx.imageSmoothingEnabled = true;
-    markCtx.imageSmoothingQuality = 'high';
-    markCtx.globalAlpha = 0.04;
-    markCtx.drawImage(stage, 0, 0, targetWidth, targetHeight);
-
-    return {
-      header: {
-        dataUrl: headerCanvas.toDataURL('image/png'),
-        width: headerCanvas.width,
-        height: headerCanvas.height,
-      },
-      watermark: {
-        dataUrl: markCanvas.toDataURL('image/png'),
-        width: markCanvas.width,
-        height: markCanvas.height,
-      },
-    };
+    return img;
   } catch {
     return null;
   }
+}
+
+/** jsPDF turns PNG transparency into black blocks. Flatten onto white, export JPEG. */
+function flattenOnWhite(img: HTMLImageElement): { dataUrl: string; width: number; height: number } {
+  const canvas = document.createElement('canvas');
+  canvas.width = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  const ctx = canvas.getContext('2d', { alpha: false });
+  if (!ctx) {
+    return { dataUrl: '', width: img.naturalWidth, height: img.naturalHeight };
+  }
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, 0, 0);
+  return {
+    dataUrl: canvas.toDataURL('image/jpeg', 0.95),
+    width: canvas.width,
+    height: canvas.height,
+  };
+}
+
+async function loadLogoAssets(): Promise<{
+  header: { dataUrl: string; width: number; height: number };
+  watermark: { dataUrl: string; width: number; height: number } | null;
+} | null> {
+  const [headerImg, markImg] = await Promise.all([
+    loadImage('/new_logo.png'),
+    loadImage('/logo-mark.png'),
+  ]);
+  if (!headerImg) return null;
+  const header = flattenOnWhite(headerImg);
+  if (!header.dataUrl) return null;
+
+  let watermark: { dataUrl: string; width: number; height: number } | null = null;
+  if (markImg) {
+    const canvas = document.createElement('canvas');
+    canvas.width = markImg.naturalWidth;
+    canvas.height = markImg.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(markImg, 0, 0);
+      watermark = {
+        dataUrl: canvas.toDataURL('image/png'),
+        width: canvas.width,
+        height: canvas.height,
+      };
+    }
+  }
+
+  return { header, watermark };
 }
 
 export interface EmiPdfInput {
@@ -118,17 +109,20 @@ export async function downloadEmiPdf(input: EmiPdfInput): Promise<void> {
 
   const headerHeight = 36;
 
-  const drawWatermark = (pageNumber: number) => {
+  const drawWatermark = () => {
     if (!watermark) return;
-    const markHeight = 250;
+    const markHeight = 165;
     const markWidth = markHeight * (watermark.width / watermark.height);
     const x = (pageWidth - markWidth) / 2;
-    const y = (pageHeight - markHeight) / 2 + 42;
+    const y = (pageHeight - markHeight) / 2 + 36;
     try {
-      doc.addImage(watermark.dataUrl, 'PNG', x, y, markWidth, markHeight, `blink-watermark-${pageNumber}`, 'NONE', 0);
+      doc.saveGraphicsState();
+      doc.setGState(new GState({ opacity: 0.07 }));
+      doc.addImage(watermark.dataUrl, 'PNG', x, y, markWidth, markHeight, 'blink-mark', 'NONE');
+      doc.restoreGraphicsState();
     } catch {
       try {
-        doc.addImage(watermark.dataUrl, 'PNG', x, y, markWidth, markHeight);
+        doc.addImage(watermark.dataUrl, 'PNG', x, y, markWidth, markHeight, 'blink-mark', 'NONE');
       } catch {
         /* skip watermark if encoding fails */
       }
@@ -147,7 +141,7 @@ export async function downloadEmiPdf(input: EmiPdfInput): Promise<void> {
       const x = 10;
       const y = (headerHeight - logoHeight) / 2;
       try {
-        doc.addImage(logo.dataUrl, 'PNG', x, y, logoWidth, logoHeight);
+        doc.addImage(logo.dataUrl, 'JPEG', x, y, logoWidth, logoHeight, 'blink-logo', 'NONE');
       } catch {
         /* skip logo if encoding fails */
       }
@@ -234,7 +228,7 @@ export async function downloadEmiPdf(input: EmiPdfInput): Promise<void> {
   doc.setFont(FONT, 'bold');
   doc.setFontSize(7.5);
   doc.setTextColor(...AMBER);
-  doc.text('LOAN EMI', 22, afterInputs + 9);
+  doc.text('MONTHLY EMI', 22, afterInputs + 9);
   doc.setTextColor(...ORANGE);
   doc.text('TOTAL INTEREST', 78, afterInputs + 9);
   doc.setTextColor(...DARK);
@@ -252,20 +246,20 @@ export async function downloadEmiPdf(input: EmiPdfInput): Promise<void> {
   doc.setFont(FONT, 'bold');
   doc.setFontSize(11);
   doc.setTextColor(...DARK);
-  doc.text('Year-wise payment schedule', 12, tableStart);
+  doc.text('Month-wise payment schedule', 12, tableStart);
 
   autoTable(doc, {
     startY: tableStart + 4,
-    head: [['Year', 'Principal (Rs.)', 'Interest (Rs.)', 'Total (Rs.)', 'Closing Balance (Rs.)']],
-    body: input.result.years.map((year) => [
-      year.label,
-      formatIndianNumber(year.principal),
-      formatIndianNumber(year.interest),
-      formatIndianNumber(year.emiTotal),
-      formatIndianNumber(year.closingBalance),
+    head: [['Month', 'Principal (Rs.)', 'Interest (Rs.)', 'Monthly EMI (Rs.)', 'Balance (Rs.)']],
+    body: input.result.schedule.map((row) => [
+      formatMonthLabel(row.date),
+      formatIndianNumber(row.principal),
+      formatIndianNumber(row.interest),
+      formatIndianNumber(row.emi),
+      formatIndianNumber(row.balance),
     ]),
     theme: 'striped',
-    styles: { font: FONT, fontSize: 8, cellPadding: 2.4, overflow: 'linebreak' },
+    styles: { font: FONT, fontSize: 8, cellPadding: 2.2, overflow: 'linebreak' },
     headStyles: {
       fillColor: DARK,
       textColor: [255, 255, 255],
@@ -276,11 +270,11 @@ export async function downloadEmiPdf(input: EmiPdfInput): Promise<void> {
     },
     bodyStyles: { font: FONT, textColor: DARK },
     columnStyles: {
-      0: { cellWidth: 28, halign: 'left', fontStyle: 'bold' },
+      0: { cellWidth: 32, halign: 'left', fontStyle: 'bold' },
       1: { cellWidth: 38, halign: 'right' },
       2: { cellWidth: 38, halign: 'right' },
-      3: { cellWidth: 40, halign: 'right' },
-      4: { cellWidth: 42, halign: 'right' },
+      3: { cellWidth: 42, halign: 'right' },
+      4: { cellWidth: 36, halign: 'right' },
     },
     didParseCell: (data) => {
       if (data.section === 'head' && data.column.index === 0) {
@@ -296,7 +290,7 @@ export async function downloadEmiPdf(input: EmiPdfInput): Promise<void> {
     doc.setPage(i);
     if (i > 1) drawHeader();
     drawFooter(i);
-    drawWatermark(i);
+    drawWatermark();
   }
 
   const safeName = input.name.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '');

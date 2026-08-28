@@ -42,7 +42,13 @@ export default function Navbar({ alwaysSolid = false }: { alwaysSolid?: boolean 
     >
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-3 group relative z-10" onClick={() => setOpen(false)}>
-          <img src="/new_logo.png" alt="Blink Finance Logo" className="h-16 w-auto object-contain drop-shadow-md" />
+          <img
+            src="/new_logo.png"
+            alt="Blink Finance Logo"
+            width={1602}
+            height={888}
+            className="h-16 w-auto object-contain drop-shadow-md filter-none"
+          />
         </Link>
 
         <div className="hidden lg:flex items-center gap-7">

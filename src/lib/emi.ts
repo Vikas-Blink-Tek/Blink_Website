@@ -28,10 +28,10 @@ const SHARED_RANGE = {
   rateMin: 1,
   rateMax: 100,
   rateStep: 0.05,
-  rateDefault: 10,
+  rateDefault: 10.5,
   tenureYearsMin: 1,
   tenureYearsMax: 100,
-  tenureYearsDefault: 5,
+  tenureYearsDefault: 20,
 };
 
 export const LOAN_CONFIGS: Record<LoanType, LoanConfig> = {
@@ -113,11 +113,7 @@ export function compactINR(n: number): string {
 }
 
 export function addMonths(date: Date, months: number): Date {
-  const d = new Date(date.getTime());
-  const day = d.getDate();
-  d.setMonth(d.getMonth() + months);
-  if (d.getDate() < day) d.setDate(0);
-  return d;
+  return new Date(date.getFullYear(), date.getMonth() + months, 1);
 }
 
 export function financialYearLabel(date: Date): string {
@@ -129,6 +125,23 @@ export function financialYearLabel(date: Date): string {
   return `FY ${year - 1}-${String(year).slice(2)}`;
 }
 
+function roundRupee(n: number): number {
+  return Math.round(n);
+}
+
+function monthlyRate(annualRate: number): number {
+  return annualRate / 12 / 100;
+}
+
+/**
+ * Indian bank / NBFC EMI (monthly reducing balance, monthly rest).
+ * Same closed-form as Excel PMT(rate/12, nper, -pv) and emicalculator.net:
+ *   EMI = P × r × (1+r)^n / ((1+r)^n − 1)
+ * where r = annualRate / 12 / 100 and n = tenure in months.
+ *
+ * EMI in Advance (leases / some car loans) is the arrears EMI discounted by one period:
+ *   EMI_advance = EMI_arrears / (1 + r)
+ */
 export function calcRawEmi(
   principal: number,
   annualRate: number,
@@ -137,14 +150,15 @@ export function calcRawEmi(
 ): number {
   if (principal <= 0 || months <= 0) return 0;
   if (annualRate <= 0) return principal / months;
-  const r = annualRate / 12 / 100;
-  const pow = Math.pow(1 + r, months);
-  const emiArrears = (principal * r * pow) / (pow - 1);
-  return scheme === 'advance' ? emiArrears / (1 + r) : emiArrears;
-}
 
-function roundRupee(n: number): number {
-  return Math.round(n);
+  const r = monthlyRate(annualRate);
+  const denom = 1 - Math.pow(1 + r, -months);
+  const emiArrears =
+    !Number.isFinite(denom) || denom === 0
+      ? principal / months
+      : (principal * r) / denom;
+
+  return scheme === 'advance' ? emiArrears / (1 + r) : emiArrears;
 }
 
 export function buildSchedule(
@@ -154,48 +168,48 @@ export function buildSchedule(
   scheme: EmiScheme,
   startDate: Date
 ): MonthRow[] {
-  const emi = roundRupee(calcRawEmi(principal, annualRate, months, scheme));
-  if (emi <= 0 || months <= 0) return [];
+  const rawEmi = calcRawEmi(principal, annualRate, months, scheme);
+  if (rawEmi <= 0 || months <= 0) return [];
 
-  const r = annualRate > 0 ? annualRate / 12 / 100 : 0;
+  const r = annualRate > 0 ? monthlyRate(annualRate) : 0;
   const rows: MonthRow[] = [];
   let balance = principal;
 
-  const pushRow = (monthIndex: number, interest: number, principalPaid: number, payment: number) => {
-    balance = Math.max(0, roundRupee((balance - principalPaid) * 100) / 100);
-    if (monthIndex === months) balance = 0;
+  for (let i = 1; i <= months; i++) {
+    const isLast = i === months;
+    const isAdvanceFirst = scheme === 'advance' && i === 1;
+
+    let interest: number;
+    let principalPaid: number;
+    let payment: number;
+
+    if (isAdvanceFirst) {
+      interest = 0;
+      principalPaid = Math.min(rawEmi, balance);
+      payment = principalPaid;
+    } else {
+      interest = balance * r;
+      principalPaid = rawEmi - interest;
+      if (isLast || principalPaid > balance) {
+        principalPaid = balance;
+        payment = principalPaid + interest;
+      } else {
+        principalPaid = Math.max(0, principalPaid);
+        payment = rawEmi;
+      }
+    }
+
+    balance = Math.max(0, balance - principalPaid);
+    if (isLast) balance = 0;
+
     rows.push({
-      monthIndex,
-      date: addMonths(startDate, monthIndex - 1),
+      monthIndex: i,
+      date: addMonths(startDate, i - 1),
       emi: roundRupee(payment),
       principal: roundRupee(principalPaid),
       interest: roundRupee(interest),
       balance: roundRupee(balance),
     });
-  };
-
-  if (scheme === 'advance') {
-    const firstPrincipal = Math.min(emi, balance);
-    pushRow(1, 0, firstPrincipal, firstPrincipal);
-    for (let i = 2; i <= months; i++) {
-      const interest = balance * r;
-      let principalPaid = emi - interest;
-      if (i === months || principalPaid > balance) {
-        principalPaid = balance;
-      }
-      principalPaid = Math.max(0, principalPaid);
-      pushRow(i, interest, principalPaid, principalPaid + interest);
-    }
-  } else {
-    for (let i = 1; i <= months; i++) {
-      const interest = balance * r;
-      let principalPaid = emi - interest;
-      if (i === months || principalPaid > balance) {
-        principalPaid = balance;
-      }
-      principalPaid = Math.max(0, principalPaid);
-      pushRow(i, interest, principalPaid, principalPaid + interest);
-    }
   }
 
   return rows;
@@ -239,6 +253,13 @@ export function calculateEmi(options: {
   startDate: Date;
   yearMode: YearMode;
 }): EmiResult {
+  const rawEmi = calcRawEmi(
+    options.principal,
+    options.annualRate,
+    options.months,
+    options.scheme
+  );
+  const emi = roundRupee(rawEmi);
   const schedule = buildSchedule(
     options.principal,
     options.annualRate,
@@ -246,9 +267,11 @@ export function calculateEmi(options: {
     options.scheme,
     options.startDate
   );
-  const totalPayment = schedule.reduce((sum, row) => sum + row.emi, 0);
-  const totalInterest = schedule.reduce((sum, row) => sum + row.interest, 0);
-  const emi = schedule[0]?.emi ?? 0;
+
+  // Bank / emicalculator.net headline totals use the unrounded formula EMI × months,
+  // not the sum of rupee-rounded schedule rows.
+  const totalPayment = roundRupee(rawEmi * options.months);
+  const totalInterest = Math.max(0, totalPayment - options.principal);
 
   return {
     emi,
@@ -269,4 +292,8 @@ export function dateFromMonthInput(value: string): Date {
   const [y, m] = value.split('-').map(Number);
   if (!y || !m) return new Date(new Date().getFullYear(), new Date().getMonth(), 1);
   return new Date(y, m - 1, 1);
+}
+
+export function formatMonthLabel(date: Date): string {
+  return date.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
 }

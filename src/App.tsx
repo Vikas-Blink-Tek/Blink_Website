@@ -744,7 +744,7 @@ const LeadForm = () => {
             ) : (
               <>
                 <div className="text-center mb-10">
-                  <img src="/new_logo.png" alt="Blink Finance" className="h-20 w-auto object-contain mx-auto mb-6 drop-shadow-md" />
+                  <img src="/new_logo.png" alt="Blink Finance" width={1602} height={888} className="h-20 w-auto object-contain mx-auto mb-6 drop-shadow-md filter-none" />
                   <h2 className="text-5xl font-extrabold font-display mb-4 text-foreground">Apply For Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-pink to-brand-orange">Loan Today</span></h2>
                   <p className="text-foreground/70 text-xl font-medium">Leave your details and our loan experts will get back to you in a blink.</p>
                 </div>
@@ -770,7 +770,7 @@ const LeadForm = () => {
                   </div>
                   <div className="flex flex-col">
                     <label className="text-sm font-bold mb-2 text-foreground">Phone Number *</label>
-                    <input type="tel" name="phone" required maxLength={15} value={formData.phone} onChange={handleInputChange} placeholder="+91 98765 43210" className={`border rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all bg-white text-foreground placeholder:text-foreground/40 shadow-sm ${phoneError ? 'border-red-500' : 'border-black/20'}`} />
+                    <input type="tel" name="phone" required maxLength={15} value={formData.phone} onChange={handleInputChange} placeholder="9999999999" className={`border rounded-xl px-4 py-3.5 focus:outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all bg-white text-foreground placeholder:text-foreground/40 shadow-sm ${phoneError ? 'border-red-500' : 'border-black/20'}`} />
                     {phoneError && <p className="text-red-500 text-xs mt-1 font-medium">{phoneError}</p>}
                   </div>
                   <div className="flex flex-col">
@@ -866,7 +866,7 @@ const FAQ = () => {
     },
     {
       q: 'How can I calculate my loan EMI?',
-      a: 'Use the free Blink Finance EMI Calculator to check monthly payments for home, personal, business, and car loans. Enter the loan amount, interest rate, and tenure to see EMI, total interest, a year-wise schedule, and download a PDF report.'
+      a: 'Use the free Blink Finance EMI Calculator to check monthly payments for home, personal, business, and car loans. Enter the loan amount, interest rate, and tenure to see monthly EMI, total interest, a month-wise schedule, and download a PDF report.'
     },
   ];
 
