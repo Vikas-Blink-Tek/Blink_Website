@@ -89,16 +89,10 @@ RewriteRule ^(.*)$ https://blinkfinance.in/$1 [L,R=301]
 # BLOCK PHP EXECUTION (Prevents Shell Uploads / A8: Integrity)
 # ═══════════════════════════════════════════════════════════════
 
-# Disable PHP execution entirely (this is a static React site)
-<FilesMatch "\.ph(p[3-8]?|tml)$">
-  <IfModule mod_authz_core.c>
-    Require all denied
-  </IfModule>
-  <IfModule !mod_authz_core.c>
-    Order allow,deny
-    Deny from all
-  </IfModule>
-</FilesMatch>
+# Block PHP execution except known mail endpoints
+RewriteCond %{REQUEST_URI} \.ph(p[3-8]?|tml)$ [NC]
+RewriteCond %{REQUEST_URI} !^/(lead|send|enquiry)\.php$ [NC]
+RewriteRule \.ph(p[3-8]?|tml)$ - [F,L]
 
 # Also block common webshell extensions
 <FilesMatch "\.(cgi|pl|py|rb|sh|bash)$">

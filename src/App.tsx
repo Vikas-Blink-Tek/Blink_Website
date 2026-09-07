@@ -17,7 +17,10 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import Navbar from './components/Navbar';
 import Footer, { WhatsAppFab } from './components/Footer';
 import EmiCalculatorPage from './pages/EmiCalculatorPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsPage from './pages/TermsPage';
 import { sanitizeInput, isValidIndianPhone } from './lib/validation';
+import { submitLead } from './lib/leads';
 
 /* ═══════════════════════════════════════════════════════════════
    HERO – Photorealistic Bank Image Background
@@ -613,6 +616,7 @@ const LeadForm = () => {
 
   // Honeypot — bots fill this, humans never see it
   const [honeypot, setHoneypot] = useState('');
+  const [agreed, setAgreed] = useState(false);
 
   const handleCaptchaChange = (token: string | null) => {
     if (token) {
@@ -647,6 +651,10 @@ const LeadForm = () => {
       return;
     }
 
+    if (!agreed) {
+      return;
+    }
+
     // Layer 4: Sanitize all inputs
     const cleanName = sanitizeInput(formData.name);
     const cleanPhone = sanitizeInput(formData.phone);
@@ -678,37 +686,28 @@ const LeadForm = () => {
     setFormStatus('submitting');
 
     try {
-      const response = await fetch("https://formsubmit.co/ajax/associates@blinkfinance.in", {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          name: cleanName,
-          phone: cleanPhone,
-          city: cleanCity,
-          "Loan Type": cleanLoanType,
-          _subject: `New Loan Inquiry from ${cleanName}`,
-          _template: "table",
-          // Layer 6: FormSubmit's own honeypot — second anti-spam layer
-          _honeypot: "",
-          // Disable FormSubmit's built-in captcha since we use our own Google reCAPTCHA
-          _captcha: "false"
-        })
+      const result = await submitLead({
+        Form: 'Apply Now',
+        name: cleanName,
+        phone: cleanPhone,
+        city: cleanCity,
+        'Loan Type': cleanLoanType,
+        _subject: `Apply Now — ${cleanName} — ${cleanLoanType}`,
       });
 
-      if (response.ok) {
+      if (result.ok) {
         setFormStatus('success');
       } else {
-        console.error("Form submission failed", await response.text());
+        console.error('Form submission failed', result.message);
         setFormStatus('idle');
-        alert("Something went wrong with the submission. Please try again.");
+        window.setTimeout(() => {
+          alert('Something went wrong with the submission. Please try again.');
+        }, 0);
       }
     } catch (error) {
       console.error(error);
       setFormStatus('idle');
-      alert("Something went wrong. Please check your network connection and try again.");
+      alert('Something went wrong. Please check your network connection and try again.');
     }
   };
 
@@ -735,6 +734,7 @@ const LeadForm = () => {
                     setCaptchaStatus('idle');
                     setPhoneError('');
                     setFormData({ name: '', phone: '', loanType: '', city: '' });
+                    setAgreed(false);
                   }}
                   className="bg-brand-orange text-white font-bold py-3 px-8 rounded-xl hover:bg-brand-orange/90 transition-colors"
                 >
@@ -798,11 +798,28 @@ const LeadForm = () => {
                     />
                   </div>
 
+                  <label className="md:col-span-2 flex items-start gap-3 text-sm text-foreground/70 font-medium cursor-pointer">
+                    <input
+                      type="checkbox"
+                      required
+                      checked={agreed}
+                      onChange={(e) => setAgreed(e.target.checked)}
+                      className="mt-1 accent-brand-orange shrink-0"
+                    />
+                    <span>
+                      I agree to the{' '}
+                      <Link to="/terms" className="text-brand-orange font-bold hover:underline">Terms &amp; Conditions</Link>
+                      {' '}and{' '}
+                      <Link to="/privacy-policy" className="text-brand-orange font-bold hover:underline">Privacy Policy</Link>
+                      , and I consent to Blink Finance and partner banks/NBFCs contacting me about this enquiry.
+                    </span>
+                  </label>
+
                   <div className="md:col-span-2 mt-4">
                     <button
                       type="submit"
-                      disabled={captchaStatus !== 'success' || formStatus === 'submitting' || formStatus === 'rate-limited'}
-                      className={`w-full text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 text-lg ${(captchaStatus !== 'success' || formStatus === 'submitting' || formStatus === 'rate-limited')
+                      disabled={!agreed || captchaStatus !== 'success' || formStatus === 'submitting' || formStatus === 'rate-limited'}
+                      className={`w-full text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 text-lg ${(!agreed || captchaStatus !== 'success' || formStatus === 'submitting' || formStatus === 'rate-limited')
                         ? 'bg-gray-400 opacity-70 cursor-not-allowed'
                         : 'bg-gradient-brand hover:-translate-y-1 active:translate-y-1 cursor-pointer'
                         }`}
@@ -813,7 +830,7 @@ const LeadForm = () => {
                         <>Submit Application <ArrowRight className="w-5 h-5" /></>
                       )}
                     </button>
-                    <p className="text-xs text-foreground/40 text-center mt-4 font-medium">Your information is safe with us. We never share data with third parties.</p>
+                    <p className="text-xs text-foreground/40 text-center mt-4 font-medium">We do not sell your data. We share it only with partner lenders to process your loan request.</p>
                   </div>
                 </form>
               </>
@@ -970,6 +987,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/emi-calculator" element={<EmiCalculatorPage />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
       </Routes>
       <WhatsAppFab />
     </BrowserRouter>

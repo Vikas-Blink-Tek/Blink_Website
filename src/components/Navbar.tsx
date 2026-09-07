@@ -17,7 +17,8 @@ export default function Navbar({ alwaysSolid = false }: { alwaysSolid?: boolean 
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const onEmiPage = location.pathname === '/emi-calculator';
-  const solid = alwaysSolid || scrolled || onEmiPage;
+  const onLegalPage = location.pathname === '/privacy-policy' || location.pathname === '/terms';
+  const solid = alwaysSolid || scrolled || onEmiPage || onLegalPage;
 
   useEffect(() => {
     if (alwaysSolid) return;

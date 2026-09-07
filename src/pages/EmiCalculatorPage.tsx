@@ -26,6 +26,7 @@ import {
   type YearMode,
 } from '../lib/emi';
 import { downloadEmiPdf } from '../lib/emiPdf';
+import { submitLead } from '../lib/leads';
 import { isValidIndianPhone, isValidPersonName, sanitizeInput } from '../lib/validation';
 import ReCAPTCHA from 'react-google-recaptcha';
 
@@ -229,6 +230,7 @@ export default function EmiCalculatorPage() {
   const [nameError, setNameError] = useState('');
   const [captchaStatus, setCaptchaStatus] = useState<'idle' | 'success'>('idle');
   const [leadStatus, setLeadStatus] = useState<'idle' | 'submitting' | 'ready' | 'downloading'>('idle');
+  const [leadAgreed, setLeadAgreed] = useState(false);
   const lastSubmitRef = useRef(0);
   const formOpenedAtRef = useRef(0);
 
@@ -296,6 +298,10 @@ export default function EmiCalculatorPage() {
       return;
     }
 
+    if (!leadAgreed) {
+      return;
+    }
+
     const cleanName = sanitizeInput(leadName);
     const cleanPhone = sanitizeInput(leadPhone);
 
@@ -327,30 +333,21 @@ export default function EmiCalculatorPage() {
     setLeadStatus('submitting');
 
     try {
-      const response = await fetch('https://formsubmit.co/ajax/associates@blinkfinance.in', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          name: cleanName,
-          phone: cleanPhone,
-          'Loan Type': config.label,
-          'Loan Amount': formatINR(principal),
-          'Interest Rate': `${rate}%`,
-          Tenure: `${months} months`,
-          EMI: formatINR(result.emi),
-          'Total Interest': formatINR(result.totalInterest),
-          'Total Payment': formatINR(result.totalPayment),
-          _subject: `EMI Calculator lead from ${cleanName}`,
-          _template: 'table',
-          _honeypot: '',
-          _captcha: 'false',
-        }),
+      const submitted = await submitLead({
+        Form: 'EMI PDF Download',
+        name: cleanName,
+        phone: cleanPhone,
+        'Loan Type': config.label,
+        'Loan Amount': formatINR(principal),
+        'Interest Rate': `${rate}%`,
+        Tenure: `${months} months`,
+        EMI: formatINR(result.emi),
+        'Total Interest': formatINR(result.totalInterest),
+        'Total Payment': formatINR(result.totalPayment),
+        _subject: `EMI PDF — ${cleanName} — ${config.label}`,
       });
 
-      if (!response.ok) {
+      if (!submitted.ok) {
         setLeadStatus('idle');
         alert('Something went wrong. Please try again.');
         return;
@@ -389,6 +386,7 @@ export default function EmiCalculatorPage() {
     setNameError('');
     setHoneypot('');
     setCaptchaStatus('idle');
+    setLeadAgreed(false);
   };
 
   const openLead = () => {
@@ -872,11 +870,26 @@ export default function EmiCalculatorPage() {
                         onExpired={() => setCaptchaStatus('idle')}
                       />
                     </div>
+                    <label className="flex items-start gap-3 text-xs text-foreground/70 font-medium cursor-pointer">
+                      <input
+                        type="checkbox"
+                        required
+                        checked={leadAgreed}
+                        onChange={(e) => setLeadAgreed(e.target.checked)}
+                        className="mt-0.5 accent-brand-orange shrink-0"
+                      />
+                      <span>
+                        I agree to the{' '}
+                        <Link to="/terms" className="text-brand-orange font-bold hover:underline">Terms</Link>
+                        {' '}and{' '}
+                        <Link to="/privacy-policy" className="text-brand-orange font-bold hover:underline">Privacy Policy</Link>.
+                      </span>
+                    </label>
                     <button
                       type="submit"
-                      disabled={captchaStatus !== 'success' || leadStatus === 'submitting'}
+                      disabled={!leadAgreed || captchaStatus !== 'success' || leadStatus === 'submitting'}
                       className={`w-full text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 ${
-                        captchaStatus !== 'success' || leadStatus === 'submitting'
+                        !leadAgreed || captchaStatus !== 'success' || leadStatus === 'submitting'
                           ? 'bg-gray-400 opacity-70 cursor-not-allowed'
                           : 'bg-gradient-brand'
                       }`}

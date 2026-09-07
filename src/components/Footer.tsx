@@ -64,6 +64,8 @@ export default function Footer() {
                     <li><Link to="/emi-calculator" className="hover:text-brand-orange transition-colors">EMI Calculator</Link></li>
                     <li><a href="/#apply" className="hover:text-brand-orange transition-colors">Apply Now</a></li>
                     <li><a href="/#faq" className="hover:text-brand-orange transition-colors">FAQ</a></li>
+                    <li><Link to="/privacy-policy" className="hover:text-brand-orange transition-colors">Privacy Policy</Link></li>
+                    <li><Link to="/terms" className="hover:text-brand-orange transition-colors">Terms &amp; Conditions</Link></li>
                   </ul>
                 </div>
               </div>
@@ -93,6 +95,11 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 text-xs text-white/50 text-center space-y-2 relative z-10">
         <p>Blink Finance is a loan facilitation/advisory service (DSA) and does not itself lend money. All loans are sanctioned and disbursed by partner banks/NBFCs at their sole discretion.</p>
         <p>GST/Udyam/Gumasta Registered | Registration: 27ABAFB5553C1ZT</p>
+        <p>
+          <Link to="/privacy-policy" className="hover:text-brand-orange">Privacy Policy</Link>
+          <span className="mx-2">|</span>
+          <Link to="/terms" className="hover:text-brand-orange">Terms &amp; Conditions</Link>
+        </p>
         <p>© {new Date().getFullYear()} Blink Finance. All rights reserved.</p>
       </div>
     </footer>
