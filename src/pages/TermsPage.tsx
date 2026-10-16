@@ -15,7 +15,7 @@ export default function TermsPage() {
 
       <LegalH2>1. Who we are</LegalH2>
       <p>
-        Blink Finance is a Direct Selling Agent (DSA) and loan-facilitation / advisory firm. We introduce customers to partner banks and NBFCs,
+        <strong>Blink Fin-Advisory Pvt. Ltd.</strong>, operating under the established brand name <strong>Blink Finance</strong>, is a Direct Selling Agent (DSA) and loan-facilitation / advisory firm. We introduce customers to partner banks and NBFCs,
         help with documentation and follow-up, and explain product options. We are GST-registered (GSTIN 27ABAFB5553C1ZT) with our office at
         FF-12 and FF-13, Delta Vrindavan, G Wing, MIDC Rd, Siddhi Vinayak Nagar, Mahajan Wadi, Mira Road East, Mira Bhayandar, Maharashtra 401107.
       </p>
@@ -143,7 +143,7 @@ export default function TermsPage() {
 
       <LegalH2>17. Contact</LegalH2>
       <p>
-        Blink Finance<br />
+        <strong>Blink Fin-Advisory Pvt. Ltd. (Brand: Blink Finance)</strong><br />
         FF-12 and FF-13, Delta Vrindavan, G Wing, MIDC Rd, Mira Road East, Maharashtra 401107<br />
         Phone: 8828821333<br />
         Email: info@blinkfinance.in

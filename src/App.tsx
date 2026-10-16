@@ -64,9 +64,19 @@ const Hero = () => (
         Not Just <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange via-brand-pink to-brand-yellow drop-shadow-sm">Random Loans</span>
       </motion.h1>
 
-      <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }} className="text-xl md:text-2xl text-foreground/70 mb-10 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-sm">
+      <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }} className="text-xl md:text-2xl text-foreground/70 mb-6 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-sm">
         Your premier DSA partner across India. We connect you with 50+ top banks to provide lightning-fast, transparent, and tailored loan solutions.
       </motion.p>
+
+      <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.25, ease: "easeOut" }} className="mb-10 px-6 py-3 rounded-2xl bg-white/60 backdrop-blur-md border border-black/5 shadow-sm inline-flex flex-col items-center max-w-xl mx-auto">
+        <span className="text-foreground/80 font-bold text-xs tracking-widest uppercase mb-1 flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-brand-orange animate-pulse"></span>
+          Company Update
+        </span>
+        <span className="text-foreground/70 text-sm md:text-base font-medium">
+          <strong className="text-foreground font-extrabold">Blink Finance</strong> is now officially <strong className="text-foreground font-extrabold">Blink Fin-Advisory Pvt. Ltd.</strong>
+        </span>
+      </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }} className="flex flex-col sm:flex-row gap-6 w-full justify-center items-center mb-24">
         <a href="#apply" className="bg-gradient-brand text-white font-bold py-5 px-10 rounded-full hover:shadow-[0_10px_40px_rgba(29,78,216,0.3)] transition-all hover:-translate-y-1 flex items-center justify-center gap-3 text-lg w-full sm:w-auto">
@@ -201,7 +211,7 @@ const TheStatement = () => {
 const TheProducts = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  
+
   // Track scroll specifically for this section
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -236,7 +246,7 @@ const TheProducts = () => {
           <div className="text-center max-w-3xl mx-auto mb-24 relative z-10">
             <p className="text-brand-orange font-bold text-sm tracking-widest uppercase mb-3">Our Loan Services</p>
             <h2 className="text-5xl md:text-6xl font-black font-display text-purple-950 tracking-tight">
-              Financial Solutions <br/>Built For You
+              Financial Solutions <br />Built For You
             </h2>
           </div>
 
@@ -248,35 +258,35 @@ const TheProducts = () => {
               const parallaxY = isInnerCol ? colInnerY : colOuterY;
 
               return (
-                <motion.div 
-                  key={loan.id} 
+                <motion.div
+                  key={loan.id}
                   layoutId={`card-${loan.id}`}
                   style={{ y: parallaxY }}
                   onClick={() => setSelectedId(loan.id)}
                   className="bg-slate-900 rounded-[2rem] flex flex-col justify-end text-left h-[340px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] cursor-pointer group hover:shadow-[0_20px_40px_rgba(236,72,153,0.3)] transition-shadow duration-500 relative overflow-hidden"
                 >
                   {/* Background Image */}
-                  <motion.img 
+                  <motion.img
                     layoutId={`image-${loan.id}`}
-                    src={loan.image} 
-                    alt={loan.title} 
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    src={loan.image}
+                    alt={loan.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
-                  
+
                   {/* Dark Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-                  
+
                   {/* Subtle hover background sweep */}
                   <div className="absolute inset-0 bg-brand-orange/0 group-hover:bg-brand-orange/20 transition-colors duration-500 mix-blend-overlay"></div>
-                  
+
                   <div className="relative z-10 p-8">
-                    <motion.h3 
-                      layoutId={`title-${loan.id}`} 
+                    <motion.h3
+                      layoutId={`title-${loan.id}`}
                       className="text-2xl md:text-3xl font-black font-display text-white leading-tight mb-2"
                     >
                       {loan.title}
                     </motion.h3>
-                    
+
                     <div className="text-brand-yellow text-xs font-bold uppercase tracking-[0.2em] opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                       Explore Details &rarr;
                     </div>
@@ -301,40 +311,40 @@ const TheProducts = () => {
             {(() => {
               const loan = loans.find(l => l.id === selectedId);
               if (!loan) return null;
-              
+
               return (
-                <motion.div 
+                <motion.div
                   layoutId={`card-${loan.id}`}
                   className="bg-white rounded-[2.5rem] w-full max-w-4xl shadow-2xl relative overflow-hidden cursor-default flex flex-col md:flex-row"
                   onClick={e => e.stopPropagation()}
                 >
                   {/* Image side */}
                   <div className="w-full md:w-5/12 h-64 md:h-auto relative">
-                    <motion.img 
+                    <motion.img
                       layoutId={`image-${loan.id}`}
-                      src={loan.image} 
-                      alt={loan.title} 
-                      className="absolute inset-0 w-full h-full object-cover" 
+                      src={loan.image}
+                      alt={loan.title}
+                      className="absolute inset-0 w-full h-full object-cover"
                     />
                     {/* Shadow overlay to blend with text section smoothly */}
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/30 md:hidden"></div>
                   </div>
-                  
+
                   {/* Content side */}
                   <div className="w-full md:w-7/12 p-8 md:p-14 relative bg-white">
                     {/* Decorative corner glow inside modal */}
                     <div className="absolute -top-32 -right-32 w-96 h-96 bg-brand-orange/10 blur-3xl rounded-full"></div>
                     <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-brand-pink/10 blur-3xl rounded-full"></div>
-                    
+
                     <div className="relative z-10 flex flex-col h-full justify-center">
-                      <motion.h3 
-                        layoutId={`title-${loan.id}`} 
+                      <motion.h3
+                        layoutId={`title-${loan.id}`}
                         className="text-4xl md:text-5xl font-black font-display text-transparent bg-clip-text bg-gradient-to-br from-brand-pink to-brand-orange mb-6 leading-tight"
                       >
                         {loan.title}
                       </motion.h3>
-                      
-                      <motion.p 
+
+                      <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1, duration: 0.4 }}
@@ -342,12 +352,28 @@ const TheProducts = () => {
                       >
                         {loan.desc}
                       </motion.p>
-                      
-                      <div className="mt-auto">
-                        <motion.button 
+
+                      <div className="mt-auto flex flex-wrap gap-3">
+                        <motion.button
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
                           transition={{ delay: 0.2 }}
+                          onClick={() => {
+                            const loanType = loan.title;
+                            setSelectedId(null);
+                            window.dispatchEvent(new CustomEvent('blink-apply', { detail: { loanType } }));
+                            window.setTimeout(() => {
+                              document.getElementById('apply')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 80);
+                          }}
+                          className="bg-gradient-to-r from-brand-pink to-brand-orange text-white px-8 py-3.5 rounded-full font-bold text-sm tracking-widest uppercase hover:shadow-lg hover:shadow-brand-orange/30 transition-all active:scale-95"
+                        >
+                          Apply Now
+                        </motion.button>
+                        <motion.button
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.25 }}
                           onClick={() => setSelectedId(null)}
                           className="bg-purple-950 text-white px-8 py-3.5 rounded-full font-bold text-sm tracking-widest uppercase hover:bg-purple-900 hover:shadow-lg hover:shadow-purple-950/20 transition-all active:scale-95"
                         >
@@ -618,6 +644,16 @@ const LeadForm = () => {
   const [honeypot, setHoneypot] = useState('');
   const [agreed, setAgreed] = useState(false);
 
+  useEffect(() => {
+    const onApply = (event: Event) => {
+      const loanType = (event as CustomEvent<{ loanType?: string }>).detail?.loanType;
+      if (!loanType) return;
+      setFormData((current) => ({ ...current, loanType }));
+    };
+    window.addEventListener('blink-apply', onApply);
+    return () => window.removeEventListener('blink-apply', onApply);
+  }, []);
+
   const handleCaptchaChange = (token: string | null) => {
     if (token) {
       setCaptchaStatus('success');
@@ -712,7 +748,7 @@ const LeadForm = () => {
   };
 
   return (
-    <section id="apply" className="py-28 relative overflow-hidden bg-background">
+    <section id="apply" className="py-28 relative overflow-hidden bg-background scroll-mt-24">
       <div className="max-w-4xl mx-auto px-6 relative z-10 perspective-1000">
         <Tilt tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2000}>
           <motion.div initial={{ opacity: 0, y: 30, rotateX: 5 }} whileInView={{ opacity: 1, y: 0, rotateX: 0 }} viewport={{ once: true }} className="bg-white shadow-2xl rounded-3xl p-10 md:p-16 border border-black/10 transform-gpu min-h-[600px] flex flex-col justify-center">
@@ -781,6 +817,14 @@ const LeadForm = () => {
                       <option value="Mortgage Loan" className="text-gray-900">Mortgage Loan</option>
                       <option value="Personal Loan" className="text-gray-900">Personal Loan</option>
                       <option value="Business Loan" className="text-gray-900">Business Loan</option>
+                      <option value="MSME Loan" className="text-gray-900">MSME Loan</option>
+                      <option value="Machinery Loan" className="text-gray-900">Machinery Loan</option>
+                      <option value="CGTMSE Loan" className="text-gray-900">CGTMSE Loan</option>
+                      <option value="Working Capital" className="text-gray-900">Working Capital</option>
+                      <option value="OD/CC" className="text-gray-900">OD/CC</option>
+                      <option value="Bill Discounting" className="text-gray-900">Bill Discounting</option>
+                      <option value="Letter of Credit" className="text-gray-900">Letter of Credit</option>
+                      <option value="Bank Guarantee" className="text-gray-900">Bank Guarantee</option>
                       <option value="Overdraft Facility" className="text-gray-900">Overdraft Facility</option>
                       <option value="Cash Credit" className="text-gray-900">Cash Credit</option>
                       <option value="MSME / CGTSME Loan" className="text-gray-900">MSME / CGTSME Loan</option>
@@ -852,6 +896,10 @@ const FAQ = () => {
     {
       q: 'How to apply for a home loan?',
       a: 'Contact Blink Finance at 8828821333 or fill out our online application form. As a trusted DSA, we connect you with 50+ bank partners including SBI, HDFC, ICICI, and Axis Bank to find the best rates. We handle all documentation and processing for a hassle-free experience.'
+    },
+    {
+      q: 'Why do I see "Blink Fin-Advisory Pvt. Ltd." on my official documents?',
+      a: 'While we operate under our established brand name "Blink Finance", our official registered company name is Blink Fin-Advisory Pvt. Ltd. (formerly a partnership firm). We updated the name when we became a Private Limited company to better reflect our core focus: providing expert financial advice and loan consultation ("Advisory") in the finance sector ("Fin"). Therefore, all official paperwork and agreements will be in the name of Blink Fin-Advisory Pvt. Ltd.'
     },
     {
       q: 'What is a DSA (Direct Selling Agent) in banking?',

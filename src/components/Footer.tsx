@@ -94,13 +94,14 @@ export default function Footer() {
 
       <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 text-xs text-white/50 text-center space-y-2 relative z-10">
         <p>Blink Finance is a loan facilitation/advisory service (DSA) and does not itself lend money. All loans are sanctioned and disbursed by partner banks/NBFCs at their sole discretion.</p>
+        <p><strong>Please Note:</strong> "Blink Finance" is our established brand name. Our official registered company name is <strong>Blink Fin-Advisory Pvt. Ltd.</strong> Therefore, all our official paperwork, loan processing, and agreements will reflect the name Blink Fin-Advisory Pvt. Ltd.</p>
         <p>GST/Udyam/Gumasta Registered | Registration: 27ABAFB5553C1ZT</p>
         <p>
           <Link to="/privacy-policy" className="hover:text-brand-orange">Privacy Policy</Link>
           <span className="mx-2">|</span>
           <Link to="/terms" className="hover:text-brand-orange">Terms &amp; Conditions</Link>
         </p>
-        <p>© {new Date().getFullYear()} Blink Finance. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Blink Fin-Advisory Pvt. Ltd. All rights reserved.</p>
       </div>
     </footer>
   );

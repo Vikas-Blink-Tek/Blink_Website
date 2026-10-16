@@ -76,7 +76,7 @@ foreach ($data as $key => $value) {
 
 $lines[] = 'Submitted: ' . date('Y-m-d H:i:s T');
 
-$to = 'sharanyapoojari@blinkfinance.in';
+$to = 'info@blinkfinance.in';
 $subject = lead_field($data, '_subject', 140);
 if ($subject === '') {
   $subject = 'Blink Finance lead — ' . $form . ' — ' . $name;

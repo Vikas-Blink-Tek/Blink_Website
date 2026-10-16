@@ -5,7 +5,7 @@ export default function PrivacyPolicyPage() {
   return (
     <LegalLayout title="Privacy Policy" updated="29 August 2026">
       <p>
-        Blink Finance (“we”, “us”, “our”) is a Direct Selling Agent (DSA) and loan-facilitation firm based in Mira Road, Maharashtra.
+        <strong>Blink Fin-Advisory Pvt. Ltd.</strong>, operating under the established brand name <strong>Blink Finance</strong> (“we”, “us”, “our”) is a Direct Selling Agent (DSA) and loan-facilitation firm based in Mira Road, Maharashtra.
         We help individuals and businesses compare and apply for loans from partner banks and NBFCs. We do not ourselves sanction or disburse credit.
         This Privacy Policy explains what personal data we collect on <a className="text-brand-orange font-bold" href="https://www.blinkfinance.in">www.blinkfinance.in</a>,
         why we use it, who we share it with, and the rights you have under the Digital Personal Data Protection Act, 2023 (DPDP Act).
@@ -22,7 +22,7 @@ export default function PrivacyPolicyPage() {
         becomes responsible for how they use the data for credit assessment, KYC, and disbursal.
       </p>
       <p>
-        <span className="font-bold text-foreground">Legal entity:</span> Blink Finance<br />
+        <span className="font-bold text-foreground">Legal entity:</span> Blink Fin-Advisory Pvt. Ltd. (Brand: Blink Finance)<br />
         <span className="font-bold text-foreground">GSTIN:</span> 27ABAFB5553C1ZT<br />
         <span className="font-bold text-foreground">Office:</span> FF-12 and FF-13, Delta Vrindavan, G Wing, MIDC Rd, Siddhi Vinayak Nagar, Mahajan Wadi, Mira Road East, Mira Bhayandar, Maharashtra 401107<br />
         <span className="font-bold text-foreground">Email:</span> info@blinkfinance.in<br />
