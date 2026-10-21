@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Globe, MessageCircle } from 'lucide-react';
 import Tilt from 'react-parallax-tilt';
+import { FIN_ADVISORY_URL } from '../lib/sites';
 
 export function WhatsAppFab() {
   return (
@@ -66,6 +67,7 @@ export default function Footer() {
                     <li><a href="/#faq" className="hover:text-brand-orange transition-colors">FAQ</a></li>
                     <li><Link to="/privacy-policy" className="hover:text-brand-orange transition-colors">Privacy Policy</Link></li>
                     <li><Link to="/terms" className="hover:text-brand-orange transition-colors">Terms &amp; Conditions</Link></li>
+                    <li className="col-span-2"><a href={FIN_ADVISORY_URL} target="_blank" rel="noopener" className="hover:text-brand-orange transition-colors">Blink Fin-Advisory Pvt. Ltd. ↗</a></li>
                   </ul>
                 </div>
               </div>
@@ -94,14 +96,14 @@ export default function Footer() {
 
       <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 text-xs text-white/50 text-center space-y-2 relative z-10">
         <p>Blink Finance is a loan facilitation/advisory service (DSA) and does not itself lend money. All loans are sanctioned and disbursed by partner banks/NBFCs at their sole discretion.</p>
-        <p><strong>Please Note:</strong> "Blink Finance" is our established brand name. Our official registered company name is <strong>Blink Fin-Advisory Pvt. Ltd.</strong> Therefore, all our official paperwork, loan processing, and agreements will reflect the name Blink Fin-Advisory Pvt. Ltd.</p>
+        <p>Sister company: <a href={FIN_ADVISORY_URL} target="_blank" rel="noopener" className="underline hover:text-brand-orange">Blink Fin-Advisory Pvt. Ltd.</a> — financial &amp; loan advisory.</p>
         <p>GST/Udyam/Gumasta Registered | Registration: 27ABAFB5553C1ZT</p>
         <p>
           <Link to="/privacy-policy" className="hover:text-brand-orange">Privacy Policy</Link>
           <span className="mx-2">|</span>
           <Link to="/terms" className="hover:text-brand-orange">Terms &amp; Conditions</Link>
         </p>
-        <p>© {new Date().getFullYear()} Blink Fin-Advisory Pvt. Ltd. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Blink Finance. All rights reserved.</p>
       </div>
     </footer>
   );

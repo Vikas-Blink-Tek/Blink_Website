@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X, Phone, Calculator } from 'lucide-react';
+import { Menu, X, Phone, Calculator, ArrowUpRight } from 'lucide-react';
+import { FIN_ADVISORY_URL } from '../lib/sites';
 
 const links = [
   { label: 'About', href: '/#about' },
   { label: 'Loans', href: '/#products' },
   { label: 'How It Works', href: '/#process' },
   { label: 'Team', href: '/#team' },
+  { label: 'Awards', href: '/#awards' },
   { label: 'FAQ', href: '/#faq' },
   { label: 'Contact', href: '/#contact' },
 ];
@@ -71,6 +73,14 @@ export default function Navbar({ alwaysSolid = false }: { alwaysSolid?: boolean 
             <Calculator className="w-4 h-4" />
             EMI Calculator
           </Link>
+          <a
+            href={FIN_ADVISORY_URL}
+            target="_blank"
+            rel="noopener"
+            className="hidden xl:flex text-sm font-bold items-center gap-1 text-foreground/70 hover:text-brand-orange transition-colors"
+          >
+            Fin-Advisory <ArrowUpRight className="w-4 h-4" />
+          </a>
         </div>
 
         <div className="hidden md:flex items-center gap-4">
@@ -106,6 +116,15 @@ export default function Navbar({ alwaysSolid = false }: { alwaysSolid?: boolean 
             <Calculator className="w-4 h-4" />
             EMI Calculator
           </Link>
+          <a
+            href={FIN_ADVISORY_URL}
+            target="_blank"
+            rel="noopener"
+            onClick={() => setOpen(false)}
+            className="text-base font-bold py-2 text-foreground/70 hover:text-foreground flex items-center gap-2"
+          >
+            Blink Fin-Advisory <ArrowUpRight className="w-4 h-4" />
+          </a>
           <a href="/#apply" className="bg-foreground text-white px-6 py-3 rounded-full text-center text-sm font-bold mt-2" onClick={() => setOpen(false)}>
             Apply Now
           </a>

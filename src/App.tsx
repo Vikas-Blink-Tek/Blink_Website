@@ -10,7 +10,8 @@ import {
   Loader2,
   ChevronDown,
   HelpCircle,
-  Calculator
+  Calculator,
+  Award
 } from 'lucide-react';
 import Tilt from 'react-parallax-tilt';
 import ReCAPTCHA from 'react-google-recaptcha';
@@ -64,19 +65,10 @@ const Hero = () => (
         Not Just <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange via-brand-pink to-brand-yellow drop-shadow-sm">Random Loans</span>
       </motion.h1>
 
-      <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }} className="text-xl md:text-2xl text-foreground/70 mb-6 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-sm">
+      <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }} className="text-xl md:text-2xl text-foreground/70 mb-10 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-sm">
         Your premier DSA partner across India. We connect you with 50+ top banks to provide lightning-fast, transparent, and tailored loan solutions.
       </motion.p>
 
-      <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.25, ease: "easeOut" }} className="mb-10 px-6 py-3 rounded-2xl bg-white/60 backdrop-blur-md border border-black/5 shadow-sm inline-flex flex-col items-center max-w-xl mx-auto">
-        <span className="text-foreground/80 font-bold text-xs tracking-widest uppercase mb-1 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-brand-orange animate-pulse"></span>
-          Company Update
-        </span>
-        <span className="text-foreground/70 text-sm md:text-base font-medium">
-          <strong className="text-foreground font-extrabold">Blink Finance</strong> is now officially <strong className="text-foreground font-extrabold">Blink Fin-Advisory Pvt. Ltd.</strong>
-        </span>
-      </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }} className="flex flex-col sm:flex-row gap-6 w-full justify-center items-center mb-24">
         <a href="#apply" className="bg-gradient-brand text-white font-bold py-5 px-10 rounded-full hover:shadow-[0_10px_40px_rgba(29,78,216,0.3)] transition-all hover:-translate-y-1 flex items-center justify-center gap-3 text-lg w-full sm:w-auto">
@@ -507,13 +499,6 @@ const TeamSection = () => {
       bio: "With over 5 years of experience in the financial services industry, Ashish Ghadge is the dynamic force behind Blink Finance. His vision is to create a transparent and client-centric platform that simplifies access to loans for individuals and businesses. Ashish specializes in loan consulting, relationship building, and partner network development, ensuring Blink Finance stays agile and efficient in a competitive market.",
       image: "/directors/ashish.png",
       imageStyle: "w-full h-full object-cover object-[center_30%] scale-[1.8]"
-    },
-    {
-      name: "Rekha Ghadge",
-      title: "Partner",
-      bio: "Ms. Rekha Ghadge is a founding partner of Blink Finance, contributing to the company's growth through her strong commitment to organizational development and client relationships. While not from a traditional finance background, she brings valuable perspective in business coordination, stakeholder engagement, and operational support.",
-      image: "/directors/rekha.png",
-      imageStyle: "w-full h-full object-cover object-top"
     }
   ];
 
@@ -531,14 +516,14 @@ const TeamSection = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-extrabold font-display text-foreground tracking-tight mb-4">
-            Meet the <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-pink to-brand-orange">Visionaries</span>
+            Meet the <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-pink to-brand-orange">Visionary</span>
           </h2>
           <p className="text-lg md:text-xl text-foreground/60 max-w-2xl mx-auto">
             The leadership driving Blink Finance's commitment to transparent, efficient, and client-centric financial solutions.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 perspective-1000">
+        <div className="max-w-2xl mx-auto perspective-1000">
           {team.map((member, index) => (
             <Tilt key={index} tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2000} className="h-full">
               <motion.div
@@ -578,6 +563,71 @@ const TeamSection = () => {
     </section>
   );
 };
+
+/* ═══════════════════════════════════════════════════════════════
+   AWARDS & RECOGNITION
+   ═══════════════════════════════════════════════════════════════ */
+const AwardSection = () => (
+  <section id="awards" className="py-24 relative bg-slate-50 border-t border-black/10 overflow-hidden scroll-mt-24" aria-label="Awards and Recognition">
+    <div className="absolute -top-20 left-1/3 w-[36rem] h-[36rem] bg-[radial-gradient(circle_at_center,rgba(251,191,36,0.15)_0%,transparent_60%)] rounded-full pointer-events-none transform-gpu"></div>
+
+    <div className="max-w-6xl mx-auto px-6 relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.7 }}
+        className="relative mx-auto w-full max-w-md"
+      >
+        <div className="rounded-[2rem] p-2 bg-gradient-to-br from-brand-yellow via-brand-pink to-brand-orange shadow-2xl">
+          <img
+            src="/awards/best-consultant-mumbai.jpg"
+            alt="Blink Finance receiving the Best Consultant in Mumbai award at the Luxury Lifestyle & Business Awards"
+            width={948}
+            height={1600}
+            loading="lazy"
+            className="w-full h-auto rounded-[1.6rem] object-cover"
+          />
+        </div>
+        <div className="absolute -bottom-6 -right-2 md:-right-6 bg-white rounded-2xl shadow-xl border border-black/5 px-5 py-4 flex items-center gap-3">
+          <div className="text-brand-orange p-2 rounded-full bg-brand-orange/10"><Award className="w-6 h-6" /></div>
+          <div className="text-left">
+            <div className="text-xs font-bold uppercase tracking-widest text-foreground/50">Winner</div>
+            <div className="text-sm font-extrabold text-foreground">Best Consultant · Mumbai</div>
+          </div>
+        </div>
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.7, delay: 0.15 }}
+        className="text-center lg:text-left"
+      >
+        <span className="text-sm font-bold text-brand-orange uppercase tracking-[0.2em]">Awards &amp; Recognition</span>
+        <h2 className="text-4xl lg:text-6xl font-black font-display mt-4 text-foreground tracking-tighter leading-[1.05]">
+          Awarded <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange via-brand-pink to-brand-yellow">Best Consultant</span> in Mumbai
+        </h2>
+        <p className="text-foreground/70 text-lg font-medium leading-relaxed mt-6 max-w-xl mx-auto lg:mx-0">
+          Blink Finance was honoured as the <strong className="text-foreground">Best Consultant in Mumbai</strong> at the <strong className="text-foreground">Luxury Lifestyle &amp; Business Awards</strong> — a recognition of our commitment to transparent advice, the right credit for every client, and fast, reliable loan support.
+        </p>
+        <ul className="mt-8 space-y-3 max-w-xl mx-auto lg:mx-0 text-left">
+          {[
+            'Recognised for client-first loan consultancy',
+            'Trusted by 1000+ clients across India',
+            'Backed by 50+ bank & NBFC partnerships',
+          ].map((point) => (
+            <li key={point} className="flex items-start gap-3 text-foreground/80 font-semibold">
+              <CheckCircle2 className="w-5 h-5 text-brand-orange shrink-0 mt-0.5" />
+              {point}
+            </li>
+          ))}
+        </ul>
+      </motion.div>
+    </div>
+  </section>
+);
 
 /* ═══════════════════════════════════════════════════════════════
    CLIENT SHOWCASE
@@ -898,10 +948,6 @@ const FAQ = () => {
       a: 'Contact Blink Finance at 8828821333 or fill out our online application form. As a trusted DSA, we connect you with 50+ bank partners including SBI, HDFC, ICICI, and Axis Bank to find the best rates. We handle all documentation and processing for a hassle-free experience.'
     },
     {
-      q: 'Why do I see "Blink Fin-Advisory Pvt. Ltd." on my official documents?',
-      a: 'While we operate under our established brand name "Blink Finance", our official registered company name is Blink Fin-Advisory Pvt. Ltd. (formerly a partnership firm). We updated the name when we became a Private Limited company to better reflect our core focus: providing expert financial advice and loan consultation ("Advisory") in the finance sector ("Fin"). Therefore, all official paperwork and agreements will be in the name of Blink Fin-Advisory Pvt. Ltd.'
-    },
-    {
       q: 'What is a DSA (Direct Selling Agent) in banking?',
       a: 'A DSA is an authorized intermediary that connects loan seekers with banks and NBFCs. Blink Finance is a registered DSA (GST: 27ABAFB5553C1ZT) that helps customers find the right loan by comparing offers from 50+ financial institutions. DSAs do not lend money directly — they facilitate the entire loan process.'
     },
@@ -1005,6 +1051,7 @@ function HomePage() {
       <TheMetrics />
       <ProcessRoadmap />
       <TeamSection />
+      <AwardSection />
       <ClientShowcase />
       <LeadForm />
       <FAQ />
